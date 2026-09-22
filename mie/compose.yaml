@@ -12,7 +12,7 @@ services:
       CRAWL4AI_API_TOKEN: ${CRAWL4AI_API_TOKEN}
       AGENTOS_DB_FILE: /data/agentos.db
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     volumes:
       - mie_agentos_data:/data
     depends_on:
@@ -25,7 +25,7 @@ services:
       CRAWL4AI_API_TOKEN: ${CRAWL4AI_API_TOKEN}
     shm_size: "1gb"
     ports:
-      - "11235:11235"
+      - "127.0.0.1:11235:11235"
     restart: unless-stopped
 
 volumes:
