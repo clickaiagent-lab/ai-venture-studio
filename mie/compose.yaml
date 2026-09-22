@@ -1,0 +1,29 @@
+name: avs-mie
+
+services:
+  mie-runtime:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      CRAWL4AI_BASE_URL: http://crawl4ai:11235
+      AGENTOS_DB_FILE: /data/agentos.db
+    ports:
+      - "8000:8000"
+    volumes:
+      - mie_agentos_data:/data
+    depends_on:
+      - crawl4ai
+    restart: unless-stopped
+
+  crawl4ai:
+    image: unclecode/crawl4ai:0.9.3
+    shm_size: "1gb"
+    ports:
+      - "11235:11235"
+    restart: unless-stopped
+
+volumes:
+  mie_agentos_data:
