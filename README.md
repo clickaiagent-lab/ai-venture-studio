@@ -34,3 +34,27 @@ Supabase project:
 - region: ap-southeast-1 (Singapore)
 
 Do not add dashboards, agents, or automation until Campaign #001 reveals a repeated need.
+
+
+## Market Intelligence Engine
+
+MIE is the dedicated intelligence intake system for **Step 03 — FIND**.
+
+It is integrated into the same Supabase project but separated from AVS Core by a human-reviewed promotion boundary.
+
+Flow:
+
+```
+Market Sources
+-> MIE Sources/Documents/Signals/Clusters
+-> MIE Candidate Opportunity
+-> Human Approval
+-> AVS Opportunity + AVS Evidence
+-> Step 04 VALIDATE
+```
+
+Key rule: raw crawled content and unreviewed AI signals never become AVS Opportunities automatically.
+
+Technical contract:
+- `docs/MIE_AVS_DATA_CONTRACT_V0_1.md`
+- `docs/MARKET_INTELLIGENCE_ENGINE_V0_1.md`
