@@ -1,0 +1,61 @@
+name: MIE Runtime CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "mie/**"
+      - ".github/workflows/mie-runtime-ci.yml"
+  pull_request:
+    paths:
+      - "mie/**"
+      - ".github/workflows/mie-runtime-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install MIE dependencies
+        working-directory: mie
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Compile Python
+        working-directory: mie
+        run: |
+          python -m compileall -q app
+
+      - name: Import runtime modules
+        working-directory: mie
+        env:
+          SUPABASE_URL: ""
+          SUPABASE_SERVICE_ROLE_KEY: ""
+          MIE_MODEL: "openai:gpt-5.5"
+        run: |
+          python - <<'PY'
+          from app.settings import get_settings
+          from app.supabase_repo import get_client
+          from app.crawl4ai_client import healthcheck
+          from app.agents.market_scout import market_scout
+
+          settings = get_settings()
+          assert market_scout.id == "market-scout"
+          assert settings.mie_default_campaign == "CAMP-0001"
+          print("MIE import smoke test passed")
+          PY
