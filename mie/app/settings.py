@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     )
 
     supabase_url: str = ""
+    supabase_secret_key: str = ""
     supabase_service_role_key: str = ""
 
     mie_model: str = "openai:gpt-5.5"
@@ -27,7 +28,7 @@ class Settings(BaseSettings):
 
     @property
     def supabase_configured(self) -> bool:
-        return bool(self.supabase_url and self.supabase_service_role_key)
+        return bool(self.supabase_url and (self.supabase_secret_key or self.supabase_service_role_key))
 
 
 @lru_cache
