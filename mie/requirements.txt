@@ -1,0 +1,5 @@
+agno[os,scheduler,openai,google]==3.0.10
+supabase>=2.0,<3.0
+pydantic-settings>=2.2,<3.0
+httpx>=0.28,<1.0
+ddgs>=9,<10
