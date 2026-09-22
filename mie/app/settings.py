@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     mie_default_campaign: str = "CAMP-0001"
 
     crawl4ai_base_url: str = "http://crawl4ai:11235"
+    crawl4ai_api_token: str = ""
     crawl_timeout_seconds: float = 120.0
     crawl_poll_seconds: float = 1.0
     crawl_poll_attempts: int = 30
