@@ -9,6 +9,7 @@ services:
       - .env
     environment:
       CRAWL4AI_BASE_URL: http://crawl4ai:11235
+      CRAWL4AI_API_TOKEN: ${CRAWL4AI_API_TOKEN}
       AGENTOS_DB_FILE: /data/agentos.db
     ports:
       - "8000:8000"
@@ -20,6 +21,8 @@ services:
 
   crawl4ai:
     image: unclecode/crawl4ai:0.9.3
+    environment:
+      CRAWL4AI_API_TOKEN: ${CRAWL4AI_API_TOKEN}
     shm_size: "1gb"
     ports:
       - "11235:11235"
