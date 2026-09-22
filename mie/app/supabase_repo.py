@@ -20,12 +20,14 @@ def get_client() -> Client:
     settings = get_settings()
     if not settings.supabase_configured:
         raise RuntimeError(
-            "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY."
+            "Supabase is not configured. Set SUPABASE_URL and SUPABASE_SECRET_KEY "
+            "(preferred) or SUPABASE_SERVICE_ROLE_KEY (legacy)."
         )
     if _client is None:
+        backend_key = settings.supabase_secret_key or settings.supabase_service_role_key
         _client = create_client(
             settings.supabase_url,
-            settings.supabase_service_role_key,
+            backend_key,
         )
     return _client
 
