@@ -32,11 +32,19 @@ def _extract_result(data: dict[str, Any]) -> dict[str, Any] | None:
     return None
 
 
+def _auth_headers() -> dict[str, str]:
+    token = get_settings().crawl4ai_api_token.strip()
+    if not token:
+        return {}
+    return {"Authorization": f"Bearer {token}"}
+
+
 def crawl_url(url: str) -> dict[str, Any]:
     settings = get_settings()
     base_url = settings.crawl4ai_base_url.rstrip("/")
+    headers = _auth_headers()
 
-    with httpx.Client(timeout=settings.crawl_timeout_seconds) as client:
+    with httpx.Client(timeout=settings.crawl_timeout_seconds, headers=headers) as client:
         response = client.post(f"{base_url}/crawl", json={"urls": [url]})
         response.raise_for_status()
         data = response.json()
@@ -82,9 +90,6 @@ def healthcheck() -> bool:
     try:
         with httpx.Client(timeout=5.0) as client:
             response = client.get(f"{base_url}/health")
-            if response.status_code < 500:
-                return True
-            response = client.get(base_url)
             return response.status_code < 500
     except Exception:
         return False
