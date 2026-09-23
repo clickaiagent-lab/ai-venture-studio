@@ -15,11 +15,11 @@
 
 ## CURRENT STEP
 
-**Step:** Begin controlled Signal extraction from MIE Research Run #001.
+**Step:** Review extracted MIE Signals from Research Run #001 and assess coverage gaps.
 
-**Current output:** Human quality review completed. The ingestion batch is sufficient as an exploratory input for Signal extraction; it is not sufficient to validate market size, willingness to pay, or an AVS Opportunity.
+**Current output:** First controlled extraction produced 11 pending Signals linked to 10 source documents. These remain hypotheses for human review, not validated market opportunities.
 
-**Success condition:** Extract source-linked candidate Signals from usable firsthand accounts and app reviews. Keep source-level confidence and contradictory evidence visible. Exclude invalid captures and do not promote Signals into AVS Opportunities.
+**Success condition:** Review each Signal against its original passage and context, separate distinct seller problems from app-specific failures, preserve counterevidence, and identify targeted source gaps before clustering.
 
 ## DONE
 
@@ -43,24 +43,25 @@
   - ECOM CPA article is commercial practitioner context and receives lower weight than firsthand accounts.
 - Provenance gap: structured author and publication-date fields were null across captures, although some source-page body/metadata includes dates and author links. Do not treat fetch time as publication date.
 - Run is technically ingestible and usable for controlled Signal extraction, but evidence coverage is narrow and source-concentrated. It cannot establish market prevalence, willingness to pay, or market size.
-- No Signals, clusters, AVS Opportunities, or promotions were created during quality review.
+- Controlled first-pass extraction stored 11 MIE Signals from 10 source documents, all with exact passages verified against stored text and review_status=PENDING. Three record positive app outcomes as counterevidence; no Signal came from the invalid page.
+- Four usable documents yielded no direct Signal in this pass: two exploratory/advice-seeking Reddit threads, the Hacker News prototype-builder prompt, and a commercial practitioner article. No clusters, AVS Opportunities, or promotions were created.
 
 ## PENDING
 
-- Extract candidate Signals with direct source/document links and distinguish firsthand reports, app reviews, advice requests, platform AI summaries, and commercial context.
-- Preserve positive/contradictory evidence, especially app reviews reporting both successful syncing and incorrect inventory updates.
-- Track source confidence and provenance limitations per Signal.
-- After Signal review, identify coverage gaps that warrant another research batch before choosing a problem to validate.
+- Human-review the 11 pending Signals against full original post/review context and verify source identity, independence, confidence and problem scope.
+- Separate inventory sync across marketplaces, Shopify-to-Shopify sync, DSers supplier sync, and refund restocking; similar keywords do not imply one shared problem.
+- Identify targeted non-Shopify sources and primary buyer accounts for repeated frequency, economic impact and current spend before selecting a problem.
+- Only after Signal review, decide whether clustering or another research batch is justified.
 
 ## BLOCKER
 
-No active model-connectivity or collection blocker.
+No active model-connectivity or collection blocker. Signal review and market validation are pending.
 
 Quality limitations: one invalid capture excluded; structured author/published-date fields are missing; sources are concentrated in Shopify-related communities and app reviews; several documents are questions or promotional/commercial content rather than independent firsthand problem reports. No blocker to exploratory Signal extraction, but no basis yet for market validation or opportunity promotion.
 
 ## NEXT
 
-Begin a controlled Signal extraction from the 14 usable captures. Use original firsthand statements and app-review text with direct provenance; exclude the invalid page and do not treat platform AI summaries, advice-seeking prompts, or the commercial practitioner article as equivalent evidence. Keep counterevidence and uncertainty attached to each Signal. Do not create or promote AVS Opportunities.
+Review the 11 PENDING Signals individually against the linked original passages and full context. Refine or reject weak/problem-mismatched records, then map independent source coverage and contradictions by narrowly defined workflow. If evidence remains thin, run a targeted source-diverse research batch before clustering or promoting anything.
 
 ## IMPORTANT DECISIONS / INVARIANTS
 
