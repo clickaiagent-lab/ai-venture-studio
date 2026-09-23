@@ -15,11 +15,11 @@
 
 ## CURRENT STEP
 
-**Step:** Source-diverse follow-up research for narrow workflows from Run #001.
+**Step:** Screen primary-source URLs for targeted follow-up collection after Run #002.
 
-**Current output:** Context QA of 11 extracted Signals completed; all remain PENDING for human review. Each of 11 narrowly separated workflows currently has only one independent source account. A targeted second batch is needed before clustering.
+**Current output:** Run #002 collected 5 URLs and completed PARTIAL after quality review: 4 commercial vendor/accounting guides are solution context only; 1 eBay Community thread contains firsthand cross-listing tool experience, but neither target workflow gained independent corroboration.
 
-**Success condition:** Collect independent firsthand accounts and current solutions for payout reconciliation and Shopify-to-external-marketplace inventory lag, preferably from non-Shopify communities. Check frequency, costs, current spend and negative cases; keep distinct workflows separate.
+**Success condition:** Screen candidate primary URLs before collection, then collect independent merchant/bookkeeper posts about payout-to-QBO matching and Shopify-to-external-marketplace stock lag. Verify exact workflow, source identity, frequency, losses, and spend.
 
 ## DONE
 
@@ -46,24 +46,26 @@
 - Controlled first-pass extraction stored 11 MIE Signals from 10 source documents, all with exact passages verified against stored text and review_status=PENDING. No Signal came from the invalid page.
 - Context QA corrected three positive app reviews from CONTRADICTS to NEUTRAL: Shopify-to-Shopify sync and return-request automation are different from external-marketplace stock lag and duplicate refund restocking. Context QA qualified disputed causes and impacts instead of presenting seller claims as verified outcomes.
 - Source coverage map found one independent account per narrowly defined workflow, no direct same-workflow contradictory Signal, and no basis for a cluster. Eleven Signals remain PENDING, not human-approved.
+- Research Run `MIE-CAMP-0001-RUN-002` completed with 5 distinct documents and 5 URLs. Market Scout collected 4 vendor/accounting guides; manual QA added 1 eBay Community discussion with firsthand seller comments on cross-listing tools and sync-direction limits. Crawler title for that page was corrected.
+- Run #002 was corrected from automatic VALID to PARTIAL: it missed independent payout buyer accounts and the specific Shopify/external-marketplace fast-sale case. Vendor guides must not count as buyer demand. Metrics were verified against five stored documents. No Signals, clusters, AVS Opportunities, or promotions were created by Run #002.
 - Four usable documents yielded no direct Signal in this pass: two exploratory/advice-seeking Reddit threads, the Hacker News prototype-builder prompt, and a commercial practitioner article. No clusters, AVS Opportunities, or promotions were created.
 
 ## PENDING
 
-- Obtain additional independent seller/bookkeeper accounts for Shopify/TikTok payout-to-QBO reconciliation and for fast-moving inventory across Shopify and external marketplaces; search beyond Shopify channels.
+- Obtain additional independent seller/bookkeeper accounts for Shopify/TikTok payout-to-QBO reconciliation and for fast-moving inventory across Shopify and external marketplaces; search beyond Shopify channels. Run #002 did not fill these gaps.
 - Include evidence that existing tools or manual workflows solve the same exact problem. Vendor documentation and marketing may map solutions but cannot establish independent demand.
 - Check frequency, quantified losses/labor, current paid tools and actual buyer for each narrow workflow.
 - Human decision on pending Signal approvals and whether any focused cluster is justified after the next evidence batch.
 
 ## BLOCKER
 
-No active model-connectivity or collection blocker. Market validation and human approval are pending.
+No active model-connectivity or crawl blocker. Market validation and human approval are pending.
 
-Quality limitations: each narrowly defined workflow has only one independent account; reviews of different products/tasks cannot count as direct counterevidence. Structured author/published-date fields remain missing. Broad web discovery found mainly vendor marketing and product documentation, so candidate URLs need screening before a targeted second run.
+Quality limitations: each target workflow still has only one independent account from Run #001. Broad discovery and Market Scout Run #002 favored vendor pages despite an explicit firsthand-source instruction. This is an active source-selection quality issue, not a model-connection failure. The eBay thread is about cross-listing tools and is only adjacent to the fast-sale scenario.
 
 ## NEXT
 
-Run a focused Research Run #002 after screening public candidate URLs: target direct seller/bookkeeper discussions on payout reconciliation and direct merchant accounts of Shopify-to-external-marketplace inventory lag, plus same-workflow working solutions. Avoid collecting generic vendor SEO pages as demand evidence. Review quality before any new Signal extraction or clustering; leave all existing Signals PENDING for human decision.
+Manually discover and screen primary public URLs from merchant, bookkeeper, eBay/Etsy and independent forum discussions before another targeted collection. Require original author experience with one of the two exact workflows, plus record any same-workflow working solutions. Then crawl only screened URLs into a new controlled run and perform QA before Signals or clusters. Keep 11 Signals PENDING for human decision.
 
 ## IMPORTANT DECISIONS / INVARIANTS
 
