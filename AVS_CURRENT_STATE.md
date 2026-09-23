@@ -15,11 +15,11 @@
 
 ## CURRENT STEP
 
-**Step:** Review extracted MIE Signals from Research Run #001 and assess coverage gaps.
+**Step:** Source-diverse follow-up research for narrow workflows from Run #001.
 
-**Current output:** First controlled extraction produced 11 pending Signals linked to 10 source documents. These remain hypotheses for human review, not validated market opportunities.
+**Current output:** Context QA of 11 extracted Signals completed; all remain PENDING for human review. Each of 11 narrowly separated workflows currently has only one independent source account. A targeted second batch is needed before clustering.
 
-**Success condition:** Review each Signal against its original passage and context, separate distinct seller problems from app-specific failures, preserve counterevidence, and identify targeted source gaps before clustering.
+**Success condition:** Collect independent firsthand accounts and current solutions for payout reconciliation and Shopify-to-external-marketplace inventory lag, preferably from non-Shopify communities. Check frequency, costs, current spend and negative cases; keep distinct workflows separate.
 
 ## DONE
 
@@ -43,25 +43,27 @@
   - ECOM CPA article is commercial practitioner context and receives lower weight than firsthand accounts.
 - Provenance gap: structured author and publication-date fields were null across captures, although some source-page body/metadata includes dates and author links. Do not treat fetch time as publication date.
 - Run is technically ingestible and usable for controlled Signal extraction, but evidence coverage is narrow and source-concentrated. It cannot establish market prevalence, willingness to pay, or market size.
-- Controlled first-pass extraction stored 11 MIE Signals from 10 source documents, all with exact passages verified against stored text and review_status=PENDING. Three record positive app outcomes as counterevidence; no Signal came from the invalid page.
+- Controlled first-pass extraction stored 11 MIE Signals from 10 source documents, all with exact passages verified against stored text and review_status=PENDING. No Signal came from the invalid page.
+- Context QA corrected three positive app reviews from CONTRADICTS to NEUTRAL: Shopify-to-Shopify sync and return-request automation are different from external-marketplace stock lag and duplicate refund restocking. Context QA qualified disputed causes and impacts instead of presenting seller claims as verified outcomes.
+- Source coverage map found one independent account per narrowly defined workflow, no direct same-workflow contradictory Signal, and no basis for a cluster. Eleven Signals remain PENDING, not human-approved.
 - Four usable documents yielded no direct Signal in this pass: two exploratory/advice-seeking Reddit threads, the Hacker News prototype-builder prompt, and a commercial practitioner article. No clusters, AVS Opportunities, or promotions were created.
 
 ## PENDING
 
-- Human-review the 11 pending Signals against full original post/review context and verify source identity, independence, confidence and problem scope.
-- Separate inventory sync across marketplaces, Shopify-to-Shopify sync, DSers supplier sync, and refund restocking; similar keywords do not imply one shared problem.
-- Identify targeted non-Shopify sources and primary buyer accounts for repeated frequency, economic impact and current spend before selecting a problem.
-- Only after Signal review, decide whether clustering or another research batch is justified.
+- Obtain additional independent seller/bookkeeper accounts for Shopify/TikTok payout-to-QBO reconciliation and for fast-moving inventory across Shopify and external marketplaces; search beyond Shopify channels.
+- Include evidence that existing tools or manual workflows solve the same exact problem. Vendor documentation and marketing may map solutions but cannot establish independent demand.
+- Check frequency, quantified losses/labor, current paid tools and actual buyer for each narrow workflow.
+- Human decision on pending Signal approvals and whether any focused cluster is justified after the next evidence batch.
 
 ## BLOCKER
 
-No active model-connectivity or collection blocker. Signal review and market validation are pending.
+No active model-connectivity or collection blocker. Market validation and human approval are pending.
 
-Quality limitations: one invalid capture excluded; structured author/published-date fields are missing; sources are concentrated in Shopify-related communities and app reviews; several documents are questions or promotional/commercial content rather than independent firsthand problem reports. No blocker to exploratory Signal extraction, but no basis yet for market validation or opportunity promotion.
+Quality limitations: each narrowly defined workflow has only one independent account; reviews of different products/tasks cannot count as direct counterevidence. Structured author/published-date fields remain missing. Broad web discovery found mainly vendor marketing and product documentation, so candidate URLs need screening before a targeted second run.
 
 ## NEXT
 
-Review the 11 PENDING Signals individually against the linked original passages and full context. Refine or reject weak/problem-mismatched records, then map independent source coverage and contradictions by narrowly defined workflow. If evidence remains thin, run a targeted source-diverse research batch before clustering or promoting anything.
+Run a focused Research Run #002 after screening public candidate URLs: target direct seller/bookkeeper discussions on payout reconciliation and direct merchant accounts of Shopify-to-external-marketplace inventory lag, plus same-workflow working solutions. Avoid collecting generic vendor SEO pages as demand evidence. Review quality before any new Signal extraction or clustering; leave all existing Signals PENDING for human decision.
 
 ## IMPORTANT DECISIONS / INVARIANTS
 
