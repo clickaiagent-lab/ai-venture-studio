@@ -15,11 +15,11 @@
 
 ## CURRENT STEP
 
-**Step:** MIE Research Run #001 — restore model authentication, then collect the first market-data batch.
+**Step:** Quality review of MIE Research Run #001.
 
-**Target output:** 10–20 real, public market documents for CAMP-0001.
+**Current output:** Assess whether the first real-data batch is sufficiently reliable to proceed to Signal extraction.
 
-**Success condition:** MIE stores 10–20 useful documents with source attribution, canonical URLs, deduplication, lineage, and usable content. Review collection quality before starting Signal Analyst design.
+**Success condition:** Review usable content, provenance, source mix, duplicates/weak captures, and coverage gaps. Decide whether ingestion quality is sufficient before designing Signal Analyst.
 
 ## DONE
 
@@ -29,33 +29,32 @@
 - MIE architecture, data contract, schema, and human-gated promotion bridge created and tested.
 - MIE Source Registry created with 8 enabled sources.
 - Agno / AgentOS, Market Scout, and Crawl4AI running locally.
-- MIE health check and an earlier end-to-end ingestion test passed.
-- Attempted Research Run #001. The model provider rejected authentication before collection tools ran. This attempt created no MIE research run and stored no documents.
+- Earlier end-to-end ingestion test passed.
+- Market Scout model connectivity test passed through the configured OpenAI-compatible route.
+- Local runtime compatibility adjustment made so custom OpenAI-compatible endpoints use Chat Completions. This code change is tested locally but not yet committed/pushed.
+- MIE Research Run `MIE-CAMP-0001-RUN-001` completed and marked `VALID`.
+- Verified run contains 15 distinct document records linked across 15 unique canonical URLs. Run metrics were reconciled to the stored count.
+- Initial QA found 14 substantive captures and 1 Shopify Community “Page Not Found” capture, which must be excluded from evidence.
+- Source mix: Reddit, Shopify Community, Shopify App Store reviews, Hacker News, and one practitioner web source.
+- No Signals, clusters, AVS Opportunities, or promotions were created.
 
 ## PENDING
 
-- Restore valid model authentication for Market Scout.
-- Run MIE Research Run #001 and collect 10–20 public e-commerce market documents.
-- Review source quality, useful vs. weak documents, duplication, coverage, provenance, and observed pain themes.
+- Review the 14 substantive documents for strength of first-hand evidence and repeated pain.
+- Check contradictory evidence, source concentration, and missing source coverage.
+- Treat the practitioner article as lower-weight context than first-hand seller discussions and app reviews.
 - Decide whether ingestion quality is sufficient.
 - Only after review, begin Signal extraction / Signal Analyst design.
 
 ## BLOCKER
 
-**Active:** Market Scout cannot authenticate with its configured model provider. Restore valid local authentication before retrying. Do not record or share secrets in this file.
+No active model-connectivity or collection blocker.
+
+QA notes: the run included one invalid page capture. During collection, an initial source-registry tool call had a malformed argument and web search intermittently returned no results; later calls recovered and the run completed. Watch for recurrence.
 
 ## NEXT
 
-1. Restore model authentication locally and restart the MIE runtime.
-2. Verify Market Scout can complete a model request.
-3. Retry MIE Research Run #001 for CAMP-0001:
-   - collect 10–20 documents only;
-   - use public sources and preserve provenance;
-   - prefer source diversity and first-hand operator material;
-   - store raw and normalized content in MIE;
-   - do not create or promote AVS Opportunities;
-   - do not build additional Agents before reviewing ingestion quality.
-4. Review the collected documents and decide whether to proceed to Signal Analyst.
+Review the 14 substantive documents in MIE. Exclude the Page Not Found capture from evidence, assess provenance and content quality, note source-coverage gaps and contradictory evidence, then decide whether to proceed to Signal Analyst. Keep observed themes exploratory; do not promote them into AVS Opportunities.
 
 ## IMPORTANT DECISIONS / INVARIANTS
 
