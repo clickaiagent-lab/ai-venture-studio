@@ -15,11 +15,11 @@
 
 ## CURRENT STEP
 
-**Step:** Quality review of MIE Research Run #001.
+**Step:** Begin controlled Signal extraction from MIE Research Run #001.
 
-**Current output:** Assess whether the first real-data batch is sufficiently reliable to proceed to Signal extraction.
+**Current output:** Human quality review completed. The ingestion batch is sufficient as an exploratory input for Signal extraction; it is not sufficient to validate market size, willingness to pay, or an AVS Opportunity.
 
-**Success condition:** Review usable content, provenance, source mix, duplicates/weak captures, and coverage gaps. Decide whether ingestion quality is sufficient before designing Signal Analyst.
+**Success condition:** Extract source-linked candidate Signals from usable firsthand accounts and app reviews. Keep source-level confidence and contradictory evidence visible. Exclude invalid captures and do not promote Signals into AVS Opportunities.
 
 ## DONE
 
@@ -34,27 +34,33 @@
 - Local runtime compatibility adjustment made so custom OpenAI-compatible endpoints use Chat Completions. This code change is tested locally but not yet committed/pushed.
 - MIE Research Run `MIE-CAMP-0001-RUN-001` completed and marked `VALID`.
 - Verified run contains 15 distinct document records linked across 15 unique canonical URLs. Run metrics were reconciled to the stored count.
-- Initial QA found 14 substantive captures and 1 Shopify Community “Page Not Found” capture, which must be excluded from evidence.
-- Source mix: Reddit, Shopify Community, Shopify App Store reviews, Hacker News, and one practitioner web source.
-- No Signals, clusters, AVS Opportunities, or promotions were created.
+- Human QA reviewed the 14 substantive captures; excluded 1 Shopify Community “Page Not Found” capture.
+- Content/provenance observations:
+  - Reddit and Shopify Community posts contain firsthand workflow details, but evidence strength varies. Some are advice-seeking or exploratory prompts, not confirmed repeated pain.
+  - Shopify Community summaries are platform-generated AI summaries; use original posts/replies as evidence, not the summaries.
+  - Three Shopify App Store pages retain actual review text and ratings. Reviews include positive outcomes and concrete inventory-sync failures; treat them as solution-market evidence, not unbiased prevalence estimates.
+  - Hacker News item is a prototype builder asking for feedback, so it is hypothesis-seeking and carries confirmation bias.
+  - ECOM CPA article is commercial practitioner context and receives lower weight than firsthand accounts.
+- Provenance gap: structured author and publication-date fields were null across captures, although some source-page body/metadata includes dates and author links. Do not treat fetch time as publication date.
+- Run is technically ingestible and usable for controlled Signal extraction, but evidence coverage is narrow and source-concentrated. It cannot establish market prevalence, willingness to pay, or market size.
+- No Signals, clusters, AVS Opportunities, or promotions were created during quality review.
 
 ## PENDING
 
-- Review the 14 substantive documents for strength of first-hand evidence and repeated pain.
-- Check contradictory evidence, source concentration, and missing source coverage.
-- Treat the practitioner article as lower-weight context than first-hand seller discussions and app reviews.
-- Decide whether ingestion quality is sufficient.
-- Only after review, begin Signal extraction / Signal Analyst design.
+- Extract candidate Signals with direct source/document links and distinguish firsthand reports, app reviews, advice requests, platform AI summaries, and commercial context.
+- Preserve positive/contradictory evidence, especially app reviews reporting both successful syncing and incorrect inventory updates.
+- Track source confidence and provenance limitations per Signal.
+- After Signal review, identify coverage gaps that warrant another research batch before choosing a problem to validate.
 
 ## BLOCKER
 
 No active model-connectivity or collection blocker.
 
-QA notes: the run included one invalid page capture. During collection, an initial source-registry tool call had a malformed argument and web search intermittently returned no results; later calls recovered and the run completed. Watch for recurrence.
+Quality limitations: one invalid capture excluded; structured author/published-date fields are missing; sources are concentrated in Shopify-related communities and app reviews; several documents are questions or promotional/commercial content rather than independent firsthand problem reports. No blocker to exploratory Signal extraction, but no basis yet for market validation or opportunity promotion.
 
 ## NEXT
 
-Review the 14 substantive documents in MIE. Exclude the Page Not Found capture from evidence, assess provenance and content quality, note source-coverage gaps and contradictory evidence, then decide whether to proceed to Signal Analyst. Keep observed themes exploratory; do not promote them into AVS Opportunities.
+Begin a controlled Signal extraction from the 14 usable captures. Use original firsthand statements and app-review text with direct provenance; exclude the invalid page and do not treat platform AI summaries, advice-seeking prompts, or the commercial practitioner article as equivalent evidence. Keep counterevidence and uncertainty attached to each Signal. Do not create or promote AVS Opportunities.
 
 ## IMPORTANT DECISIONS / INVARIANTS
 
