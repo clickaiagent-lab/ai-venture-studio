@@ -15,11 +15,11 @@
 
 ## CURRENT STEP
 
-**Step:** Crawl screened primary URLs once the local MIE runtime is reachable.
+**Step:** QA Run #003 captures and broaden firsthand evidence beyond Shopify Community.
 
-**Current output:** Four primary-thread URLs have been screened for follow-up. Local MIE/Crawl4AI host is offline, so none of these URLs has been stored in a new run. An existing Run #001 thread yielded one additional firsthand solution Signal; 12 Signals are PENDING.
+**Current output:** Local MIE/Crawl4AI is healthy. Run `MIE-CAMP-0001-RUN-003` is COMPLETED/PARTIAL with four distinct Shopify Community documents linked to four URLs. All four original merchant posts were captured, but some later reply bodies are missing from normalized markdown. Twelve Signals remain PENDING; no new Signal or cluster was created.
 
-**Success condition:** Restore local MIE access, crawl only screened URLs in a controlled Run #003, then verify captured original posts/replies, source identity, duplicates and actual independent evidence before extracting more Signals.
+**Success condition:** Recover and verify original reply bodies where missing, check current native and paid solutions against the exact workflows, and add independent firsthand sources outside Shopify Community before Signal review.
 
 ## DONE
 
@@ -50,25 +50,26 @@
 - Run #002 was corrected from automatic VALID to PARTIAL: it missed independent payout buyer accounts and the specific Shopify/external-marketplace fast-sale case. Vendor guides must not count as buyer demand. Metrics were verified against five stored documents. No Signals, clusters, AVS Opportunities, or promotions were created by Run #002.
 - New source review found that the author of Run #001 flash-sale thread later promoted a specific sync app in another thread. Signal `run001-02` confidence was lowered to 1; independence is uncertain. This does not prove the original claim false.
 - Added Signal `run001-12` from a different merchant reply already captured in Run #001: Bookkeep payout-level entries and summary QBO records reportedly helped at high volume. Marked SOLUTION / NEUTRAL / PENDING, not independent new pain or verified price. Total now 12 PENDING Signals.
-- Screened four public forum threads for follow-up: payout journal-entry difficulty due to refunds from earlier periods [Shopify Community](https://community.shopify.com/t/how-can-i-effectively-reconcile-payouts-in-quickbooks/235964); Shopify-to-eBay orders for out-of-stock items despite auto-sync [Shopify Community](https://community.shopify.com/t/marketplace-connect-not-syncing-inventory/406378); Shopify-to-Amazon overselling and FBA availability [Shopify Community](https://community.shopify.com/t/best-way-to-keep-shopify-and-amazon-inventory-in-sync/561926); older Shopify/QBO monthly report request [Shopify Community](https://community.shopify.com/t/how-to-find-monthly-reconciliation-reports-in-shopify/277769). The latter two require stronger QA: vendor promotion is mixed into Amazon replies, and current native reporting may address the older report request. None are yet in a new MIE run.
+- Screened four public forum threads for follow-up: payout journal-entry difficulty due to refunds from earlier periods [Shopify Community](https://community.shopify.com/t/how-can-i-effectively-reconcile-payouts-in-quickbooks/235964); Shopify-to-eBay orders for out-of-stock items despite auto-sync [Shopify Community](https://community.shopify.com/t/marketplace-connect-not-syncing-inventory/406378); Shopify-to-Amazon overselling and FBA availability [Shopify Community](https://community.shopify.com/t/best-way-to-keep-shopify-and-amazon-inventory-in-sync/561926); older Shopify/QBO monthly report request [Shopify Community](https://community.shopify.com/t/how-to-find-monthly-reconciliation-reports-in-shopify/277769). The latter two require stronger QA: vendor promotion is mixed into Amazon replies, and current native reporting may address the older report request. All four have now been captured in Run #003; see the QA result below.
+- Run `MIE-CAMP-0001-RUN-003` completed as PARTIAL with four distinct documents and four unique URLs from the screened Shopify Community threads. All were newly stored via the agreed local Crawl4AI intake path under `SRC-DISCOURSE`, with raw HTML and normalized markdown; metrics match actual run links (4). Each original post is present. The payout/QBO refund-timing problem, eBay out-of-stock cancellations despite Marketplace Connect, Amazon/Shopify overselling with FBA distinctions, and older monthly-report request are represented in the captured originals. Multiple later reply author headers appear without their reply bodies in normalized markdown; do not claim complete replies or treat AI-generated topic summaries as original evidence. The old monthly-report thread's AI summary mentions a newer native Shopify payout reconciliation report, but the primary reply and official feature details still require verification. No new Signal was extracted; all 12 existing Signals remain PENDING. No cluster or promotion was created.
 - Four usable documents yielded no direct Signal in this pass: two exploratory/advice-seeking Reddit threads, the Hacker News prototype-builder prompt, and a commercial practitioner article. No clusters, AVS Opportunities, or promotions were created.
 
 ## PENDING
 
-- When local MIE is reachable, crawl the four screened threads as a small controlled Run #003; inspect original posts and replies. Continue seeking primary non-Shopify sources because all four new candidates are Shopify Community threads.
+- Recover missing reply bodies for Run #003 through the approved Crawl4AI/Discourse intake and verify source authors/dates without mistaking fetch time for publication time. Seek independent firsthand accounts outside Shopify Community because all four new captures come from the same platform.
 - Include evidence that existing tools or manual workflows solve the same exact problem. Vendor documentation and marketing may map solutions but cannot establish independent demand.
 - Check frequency, quantified losses/labor, current paid tools and actual buyer for each narrow workflow.
 - Human decision on 12 pending Signal approvals and whether any focused cluster is justified after the next evidence batch.
 
 ## BLOCKER
 
-Current technical blocker: the connected local PC that hosts MIE/Crawl4AI is offline, so the screened URLs cannot be crawled through the agreed intake path. Market validation and human approval are pending.
+Technical blocker for full QA: the default Crawl4AI normalized markdown includes four original posts but omits bodies of some later replies in multi-post Shopify threads. The PC/MIE connection is restored. Market validation and human approval remain pending.
 
 Quality limitations: each target workflow still has only one independent account from Run #001. Broad discovery and Market Scout Run #002 favored vendor pages despite an explicit firsthand-source instruction. This is an active source-selection quality issue, not a model-connection failure. The eBay thread is about cross-listing tools and is only adjacent to the fast-sale scenario.
 
 ## NEXT
 
-Once the local PC and Remote Desktop Commander connection are online, verify MIE health; create controlled Run #003 and crawl only the four screened URLs listed in DONE. Confirm full original posts were stored, reject advice/marketing as demand evidence, correct metadata and counts, and decide whether more non-Shopify primary sources are needed. Keep 12 Signals PENDING; no cluster or AVS promotion.
+Complete reply-level QA for Run #003 using the agreed intake path, checking whether raw HTML or Discourse per-post pages expose missing reply bodies. Verify the newer native payout reconciliation report from an original answer and official Shopify documentation. Then source independent firsthand non-Shopify accounts for these exact workflows, including contrary evidence and paid alternatives. Keep 12 Signals PENDING until human review; no cluster or AVS promotion.
 
 ## IMPORTANT DECISIONS / INVARIANTS
 
