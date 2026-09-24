@@ -15,9 +15,9 @@
 
 ## CURRENT STEP
 
-**Step:** Verify independent repeated pain and economic impact for the two narrow workflows after Reddit Run #007, accounting for current QBO connector coverage.
+**Step:** Correct Market Scout ownership and quality gates before another research batch; assess Agno AgentOS versus Hermes without changing AVS architecture.
 
-**Current output:** Run #006 is COMPLETED/INVALID: the one Intuit forum capture contained empty HTML, was marked IGNORED, and yields zero usable documents. Run #007 is COMPLETED/PARTIAL: one original Reddit merchant-side QuickBooks Desktop negative-payout case was captured and verified, but it is adjacent to the target QBO cross-period workflow and has no quantified loss or confirmed resolution. Current Intuit documentation says the Shopify Connector for QBO imports refunds, fees and payouts and supports negative payouts; older complaints cannot establish a current unmet gap. Twelve Signals remain PENDING; no new Signal, cluster, or AVS promotion.
+**Current output:** Run #006 is COMPLETED/INVALID: the one Intuit forum capture contained empty HTML, was marked IGNORED, and yields zero usable documents. Run #007 is COMPLETED/PARTIAL: one original Reddit merchant-side QuickBooks Desktop negative-payout case was captured and verified, but it is adjacent to the target QBO cross-period workflow and has no quantified loss or confirmed resolution. Current Intuit documentation says the Shopify Connector for QBO imports refunds, fees and payouts and supports negative payouts; older complaints cannot establish a current unmet gap. Twelve Signals remain PENDING; no new Signal, cluster, or AVS promotion. Role audit: Runs #003–#007 were manually discovered/initiated by the assistant rather than autonomous Agno discovery, contrary to the agreed division of labor; pause further manual source hunting.
 
 **Success condition:** Establish at least two independent, exact-workflow buyer accounts per candidate with dated original context; verify frequency, financial/labor impact and present workaround or paid tool before proposing any Signal approval.
 
@@ -60,6 +60,9 @@
 
 ## PENDING
 
+- Restore intended responsibilities: Market Scout/Agno discovers, selects, captures, and reports sources autonomously; assistant reviews quality, analyzes evidence, and advises the human. Require origin labels and actual tool-call trace per run so an `orchestrator` field does not misstate who discovered a URL.
+- Add enforceable research quality controls around existing tools: firsthand buyer/source-type and independence checks, publication date/author where available, duplicate/capture-empty rejection, counterevidence/solution checks, run completeness metrics computed from stored documents, explicit PARTIAL/INVALID on insufficient evidence, and a bounded test with two target queries. Preserve Supabase MIE as source of truth and human gates.
+- Verify AgentOS Control Plane connection and visible agent run/trace on the user's PC; current code has `tracing=True` and a persistent SQLite AgentOS DB, but no Control Plane connection was verified in this review. Document a simple run/inspect flow for the user. Hermes is a possible future runtime alternative, not yet selected or integrated.
 - Find recent original merchant/accountant accounts that specifically describe cross-period refunds in Shopify payout-to-QBO journal entries **after** configuring the current native Shopify Connector, with actual time/cost and current paid/manual solution. Historical forum cases and the Desktop negative-payout case are leads, not verified current QBO gaps. Find independent sellers with confirmed Shopify/eBay or Amazon oversell incidents and resolution; do not confuse exploratory setup requests or other marketplace combinations with that failure.
 - Compare exact workflow coverage of the current Shopify Connector for QBO, Shopify Payments activity reporting, transaction exports, A2X/Bookkeep and marketplace sync tools. Check whether suspected missing SKUs/configuration, FBA availability, and actual latency are distinct causes; vendor replies cannot establish demand.
 - Check frequency, quantified losses/labor, current paid tools and actual buyer for each narrow workflow.
@@ -67,13 +70,13 @@
 
 ## BLOCKER
 
-No current model or runtime connectivity blocker. Intuit forum pages return empty HTML to local Crawl4AI, so Run #006 provides no usable MIE evidence. Remaining blocker is evidence quality: Run #007 adds an adjacent Desktop case but does not verify repeated current QBO cross-period failure, frequency, loss or willingness to pay. The native QBO connector documentation explicitly addresses refunds and negative payouts. Vendor replies and near-duplicate posts need independence checks before Signal approval or clustering.
+Workflow blocker: assistant performed discovery in Runs #003–#007, contrary to intended role. Market Scout currently has DuckDuckGo search and Crawl4AI intake, but source quality is mainly prompt guidance, `finish_research_run` accepts caller-supplied count and validity, and no verified user-facing Control Plane connection or source-origin record is in place. No current model or runtime connectivity blocker. Intuit forum pages return empty HTML to local Crawl4AI, so Run #006 provides no usable MIE evidence. Remaining blocker is evidence quality: Run #007 adds an adjacent Desktop case but does not verify repeated current QBO cross-period failure, frequency, loss or willingness to pay. The native QBO connector documentation explicitly addresses refunds and negative payouts. Vendor replies and near-duplicate posts need independence checks before Signal approval or clustering.
 
 Quality limitations: each target workflow still has only one independent account from Run #001. Broad discovery and Market Scout Run #002 favored vendor pages despite an explicit firsthand-source instruction. This is an active source-selection quality issue, not a model-connection failure. The eBay thread is about cross-listing tools and is only adjacent to the fast-sale scenario.
 
 ## NEXT
 
-Find recent original QBO users with a documented cross-period refund reconciliation failure **despite** the current Shopify Connector (or explain why they cannot use it), plus independent Shopify/eBay/Amazon oversell incidents with settings, SKU/FBA context, order volume, labor/loss and resolution. Check A2X/Bookkeep and native marketplace synchronization against exact failure modes. Use an approved intake path for new evidence; do not count empty captures, old complaints, vendor pitches or Desktop cases as a second exact QBO buyer. Keep 12 Signals PENDING until human review; no cluster or AVS promotion.
+First make Agno Market Scout independently run one bounded research batch under a strict buyer-evidence brief, verify its own URL discovery and tool calls in AgentOS traces, check saved document count and source quality against MIE, and expose the AgentOS Control Plane to the user. Assistant performs QA and interpretation only. If this acceptance test fails after targeted repair, compare Hermes migration with the same MIE storage and human gate. Then find recent original QBO users with a documented cross-period refund reconciliation failure **despite** the current Shopify Connector (or explain why they cannot use it), plus independent Shopify/eBay/Amazon oversell incidents with settings, SKU/FBA context, order volume, labor/loss and resolution. Check A2X/Bookkeep and native marketplace synchronization against exact failure modes. Use an approved intake path for new evidence; do not count empty captures, old complaints, vendor pitches or Desktop cases as a second exact QBO buyer. Keep 12 Signals PENDING until human review; no cluster or AVS promotion.
 
 ## IMPORTANT DECISIONS / INVARIANTS
 
@@ -84,7 +87,7 @@ Find recent original QBO users with a documented cross-period refund reconciliat
 - GitHub stores technical/versioned assets, including this checkpoint.
 - Google Drive stores human-readable business documents.
 - MIE is the market-intelligence intake layer for Step 03, not a new AVS step.
-- Agno is the current Agent runtime, not the MIE itself.
+- Agno is the current Agent runtime, not the MIE itself. Market Scout owns autonomous source discovery and collection; assistant owns quality review and analysis. An alternative runtime such as Hermes requires a separate deliberate decision and an equivalent MIE integration.
 - Crawl4AI is the primary crawler.
 - n8n is orchestration/integration, not memory.
 - Human review gates promotion into AVS.
