@@ -3,7 +3,7 @@
 > Operational checkpoint for AI Venture Studio. Keep only the latest agreed state here; do not use this as a history log.  
 > Update at the end of each important Chat/Work session. Never add credentials, private infrastructure identifiers, or machine-specific paths.
 
-**Last updated:** 2026-09-23
+**Last updated:** 2026-09-24
 
 ---
 
@@ -15,11 +15,11 @@
 
 ## CURRENT STEP
 
-**Step:** Screen primary-source URLs for targeted follow-up collection after Run #002.
+**Step:** Crawl screened primary URLs once the local MIE runtime is reachable.
 
-**Current output:** Run #002 collected 5 URLs and completed PARTIAL after quality review: 4 commercial vendor/accounting guides are solution context only; 1 eBay Community thread contains firsthand cross-listing tool experience, but neither target workflow gained independent corroboration.
+**Current output:** Four primary-thread URLs have been screened for follow-up. Local MIE/Crawl4AI host is offline, so none of these URLs has been stored in a new run. An existing Run #001 thread yielded one additional firsthand solution Signal; 12 Signals are PENDING.
 
-**Success condition:** Screen candidate primary URLs before collection, then collect independent merchant/bookkeeper posts about payout-to-QBO matching and Shopify-to-external-marketplace stock lag. Verify exact workflow, source identity, frequency, losses, and spend.
+**Success condition:** Restore local MIE access, crawl only screened URLs in a controlled Run #003, then verify captured original posts/replies, source identity, duplicates and actual independent evidence before extracting more Signals.
 
 ## DONE
 
@@ -48,24 +48,27 @@
 - Source coverage map found one independent account per narrowly defined workflow, no direct same-workflow contradictory Signal, and no basis for a cluster. Eleven Signals remain PENDING, not human-approved.
 - Research Run `MIE-CAMP-0001-RUN-002` completed with 5 distinct documents and 5 URLs. Market Scout collected 4 vendor/accounting guides; manual QA added 1 eBay Community discussion with firsthand seller comments on cross-listing tools and sync-direction limits. Crawler title for that page was corrected.
 - Run #002 was corrected from automatic VALID to PARTIAL: it missed independent payout buyer accounts and the specific Shopify/external-marketplace fast-sale case. Vendor guides must not count as buyer demand. Metrics were verified against five stored documents. No Signals, clusters, AVS Opportunities, or promotions were created by Run #002.
+- New source review found that the author of Run #001 flash-sale thread later promoted a specific sync app in another thread. Signal `run001-02` confidence was lowered to 1; independence is uncertain. This does not prove the original claim false.
+- Added Signal `run001-12` from a different merchant reply already captured in Run #001: Bookkeep payout-level entries and summary QBO records reportedly helped at high volume. Marked SOLUTION / NEUTRAL / PENDING, not independent new pain or verified price. Total now 12 PENDING Signals.
+- Screened four public forum threads for follow-up: payout journal-entry difficulty due to refunds from earlier periods [Shopify Community](https://community.shopify.com/t/how-can-i-effectively-reconcile-payouts-in-quickbooks/235964); Shopify-to-eBay orders for out-of-stock items despite auto-sync [Shopify Community](https://community.shopify.com/t/marketplace-connect-not-syncing-inventory/406378); Shopify-to-Amazon overselling and FBA availability [Shopify Community](https://community.shopify.com/t/best-way-to-keep-shopify-and-amazon-inventory-in-sync/561926); older Shopify/QBO monthly report request [Shopify Community](https://community.shopify.com/t/how-to-find-monthly-reconciliation-reports-in-shopify/277769). The latter two require stronger QA: vendor promotion is mixed into Amazon replies, and current native reporting may address the older report request. None are yet in a new MIE run.
 - Four usable documents yielded no direct Signal in this pass: two exploratory/advice-seeking Reddit threads, the Hacker News prototype-builder prompt, and a commercial practitioner article. No clusters, AVS Opportunities, or promotions were created.
 
 ## PENDING
 
-- Obtain additional independent seller/bookkeeper accounts for Shopify/TikTok payout-to-QBO reconciliation and for fast-moving inventory across Shopify and external marketplaces; search beyond Shopify channels. Run #002 did not fill these gaps.
+- When local MIE is reachable, crawl the four screened threads as a small controlled Run #003; inspect original posts and replies. Continue seeking primary non-Shopify sources because all four new candidates are Shopify Community threads.
 - Include evidence that existing tools or manual workflows solve the same exact problem. Vendor documentation and marketing may map solutions but cannot establish independent demand.
 - Check frequency, quantified losses/labor, current paid tools and actual buyer for each narrow workflow.
-- Human decision on pending Signal approvals and whether any focused cluster is justified after the next evidence batch.
+- Human decision on 12 pending Signal approvals and whether any focused cluster is justified after the next evidence batch.
 
 ## BLOCKER
 
-No active model-connectivity or crawl blocker. Market validation and human approval are pending.
+Current technical blocker: the connected local PC that hosts MIE/Crawl4AI is offline, so the screened URLs cannot be crawled through the agreed intake path. Market validation and human approval are pending.
 
 Quality limitations: each target workflow still has only one independent account from Run #001. Broad discovery and Market Scout Run #002 favored vendor pages despite an explicit firsthand-source instruction. This is an active source-selection quality issue, not a model-connection failure. The eBay thread is about cross-listing tools and is only adjacent to the fast-sale scenario.
 
 ## NEXT
 
-Manually discover and screen primary public URLs from merchant, bookkeeper, eBay/Etsy and independent forum discussions before another targeted collection. Require original author experience with one of the two exact workflows, plus record any same-workflow working solutions. Then crawl only screened URLs into a new controlled run and perform QA before Signals or clusters. Keep 11 Signals PENDING for human decision.
+Once the local PC and Remote Desktop Commander connection are online, verify MIE health; create controlled Run #003 and crawl only the four screened URLs listed in DONE. Confirm full original posts were stored, reject advice/marketing as demand evidence, correct metadata and counts, and decide whether more non-Shopify primary sources are needed. Keep 12 Signals PENDING; no cluster or AVS promotion.
 
 ## IMPORTANT DECISIONS / INVARIANTS
 
