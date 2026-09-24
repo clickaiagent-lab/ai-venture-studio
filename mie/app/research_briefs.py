@@ -4,7 +4,7 @@ from typing import Any
 
 CAMPAIGN_RESEARCH_BRIEFS: dict[str, dict[str, Any]] = {
     "CAMP-0001": {
-        "version": "ecommerce-niche-map-v0.2",
+        "version": "ecommerce-niche-map-v0.3",
         "campaign": "E-commerce Campaign #001",
         "research_goal": "Discover narrow, recurring, economically meaningful workflows for reachable global SMB and prosumer buyers before selecting an opportunity.",
         "buyer_lenses": [

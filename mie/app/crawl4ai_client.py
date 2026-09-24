@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import time
 from typing import Any
 
@@ -30,6 +31,35 @@ def _extract_result(data: dict[str, Any]) -> dict[str, Any] | None:
         return result
 
     return None
+
+
+def _enrich_metadata(metadata: dict[str, Any], html: str) -> dict[str, Any]:
+    enriched = dict(metadata)
+    if not enriched.get("published_at"):
+        for key in ("article:published_time", "datePublished"):
+            if enriched.get(key):
+                enriched["published_at"] = enriched[key]
+                break
+    if not enriched.get("published_at") and html:
+        patterns = (
+            r'"datePublished"\s*:\s*"([^"]+)"',
+            r'property=["\']article:published_time["\'][^>]+content=["\']([^"\']+)',
+            r'<time[^>]+datetime=["\']([^"\']+)',
+        )
+        for pattern in patterns:
+            match = re.search(pattern, html, flags=re.IGNORECASE)
+            if match:
+                enriched["published_at"] = match.group(1)
+                break
+    if not enriched.get("author") and html:
+        match = re.search(
+            r'"author"\s*:\s*\{[^{}]{0,500}?"name"\s*:\s*"([^"]+)"',
+            html,
+            flags=re.IGNORECASE,
+        )
+        if match:
+            enriched["author"] = match.group(1)
+    return enriched
 
 
 def _auth_headers() -> dict[str, str]:
@@ -71,6 +101,7 @@ def crawl_url(url: str) -> dict[str, Any]:
         )
         markdown = _markdown_text(item.get("markdown"))
         html = item.get("html") if isinstance(item.get("html"), str) else ""
+        metadata = _enrich_metadata(metadata, html)
 
         if not markdown and not html:
             raise RuntimeError(f"Crawl4AI returned empty content for {url}")

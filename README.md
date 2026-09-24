@@ -59,8 +59,11 @@ Technical contract:
 - `docs/MIE_AVS_DATA_CONTRACT_V0_1.md`
 - `docs/MARKET_INTELLIGENCE_ENGINE_V0_1.md`
 
-## Market Scout v0.2
+## Market Scout v0.3
 
-- Runtime and Agno UI guide: `docs/MIE_RUNTIME_V0_2.md`
+- Runtime and Agno UI guide: `docs/MIE_RUNTIME_V0_3.md`
+- Adaptive bounded search, post-crawl evidence review and campaign evidence memory.
+- Useful evidence requires a stored exact passage, verified actor and absolute publication date.
+- Run validity requires two independently authored buyer accounts for one exact workflow.
 - Local MIE start page: `http://localhost:8000/mie`
 - Agno Control Plane endpoint: `http://localhost:8000`

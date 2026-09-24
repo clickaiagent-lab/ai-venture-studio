@@ -124,9 +124,9 @@ def ensure_research_run(
         "objective": objective,
         "research_query": research_query,
         "source_scope": source_codes,
-        "orchestrator": "Agno-Market-Scout-v0.2",
+        "orchestrator": "Agno-Market-Scout-v0.3",
         "model_name": get_settings().mie_model,
-        "prompt_version": "market-scout-v0.2",
+        "prompt_version": "market-scout-v0.3",
         "status": "DRAFT",
         "run_metrics": initial_metrics or {},
         "created_by_type": "AGENT",
@@ -230,6 +230,11 @@ def store_document(
             "external_id": external_id,
             "title": title,
             "author_reference": (metadata or {}).get("author"),
+            "published_at": (
+                (metadata or {}).get("published_at")
+                or (metadata or {}).get("article:published_time")
+                or (metadata or {}).get("datePublished")
+            ),
             "fetched_at": _utcnow(),
             "fetch_method": fetch_method,
             "raw_text": raw_text,
@@ -301,15 +306,37 @@ def list_campaign_documents(campaign_code: str, limit: int = 500) -> list[dict[s
 
 def find_document_by_url(url: str) -> dict[str, Any] | None:
     target = canonicalize_url(url)
+    fields = (
+        "id,source_id,canonical_url,content_hash,title,status,author_reference,"
+        "published_at,fetched_at,metadata,normalized_text"
+    )
+    exact = (
+        get_client().table("mie_documents")
+        .select(fields).eq("canonical_url", target).limit(1).execute()
+    )
+    if exact.data:
+        return exact.data[0]
+
+    legacy = (
+        get_client().table("mie_documents")
+        .select("id,canonical_url").limit(1000).execute()
+    )
+    for item in legacy.data or []:
+        if canonicalize_url(item.get("canonical_url") or "") == target:
+            return get_document_by_id(item["id"])
+    return None
+
+
+def get_document_by_id(document_id: str) -> dict[str, Any] | None:
     result = (
         get_client().table("mie_documents")
-        .select("id,canonical_url,content_hash,title,status,fetched_at,metadata")
-        .limit(1000).execute()
+        .select(
+            "id,source_id,canonical_url,content_hash,title,status,author_reference,"
+            "published_at,fetched_at,metadata,normalized_text"
+        )
+        .eq("id", document_id).limit(1).execute()
     )
-    for item in result.data or []:
-        if canonicalize_url(item.get("canonical_url") or "") == target:
-            return item
-    return None
+    return result.data[0] if result.data else None
 
 
 def attach_document_to_run(

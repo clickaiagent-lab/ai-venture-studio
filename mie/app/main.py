@@ -35,7 +35,7 @@ def mie_health() -> dict:
         "status": "ok" if supabase_ok and crawl4ai_ok else "degraded",
         "supabase": supabase_ok, "crawl4ai": crawl4ai_ok,
         "enabled_source_count": source_count,
-        "market_scout_agent": "market-scout", "market_scout_version": "0.2",
+        "market_scout_agent": "market-scout", "market_scout_version": "0.3",
         "model": settings.mie_model,
         "agentos_control_plane_endpoint": "http://localhost:8000",
         "error": error,

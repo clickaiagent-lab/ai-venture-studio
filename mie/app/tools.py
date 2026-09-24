@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any
+from datetime import datetime
+from typing import Any, Literal
 
 from ddgs import DDGS
 from pydantic import BaseModel, Field
@@ -13,6 +14,7 @@ from app.supabase_repo import (
     attach_document_to_run,
     ensure_research_run,
     find_document_by_url,
+    get_document_by_id,
     get_campaign_by_code,
     get_research_run,
     list_campaign_documents,
@@ -37,6 +39,68 @@ def _visible_length(markdown: str, html: str) -> int:
     return len(" ".join(text.split()))
 
 
+def _normalized_text(value: str) -> str:
+    return " ".join((value or "").lower().split())
+
+
+def _iso_source_date(value: str) -> str | None:
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    candidate = raw[:10]
+    try:
+        return datetime.strptime(candidate, "%Y-%m-%d").date().isoformat()
+    except ValueError:
+        pass
+    for fmt in ("%b %d, %Y", "%B %d, %Y"):
+        try:
+            return datetime.strptime(raw, fmt).date().isoformat()
+        except ValueError:
+            continue
+    return None
+
+
+def _actor_key(value: str) -> str:
+    return _normalized_text(re.split(r"\s*\(", value or "", maxsplit=1)[0])
+
+
+def _query_tokens(query: str) -> set[str]:
+    tokens = set()
+    for token in re.findall(r"[a-z0-9]+", (query or "").lower()):
+        if len(token) > 4 and token.endswith("s"):
+            token = token[:-1]
+        if len(token) > 2:
+            tokens.add(token)
+    return tokens
+
+
+def _query_similarity(left: str, right: str) -> float:
+    a, b = _query_tokens(left), _query_tokens(right)
+    if not a or not b:
+        return 0.0
+    return len(a & b) / len(a | b)
+
+
+def _document_preview(document: dict[str, Any], max_chars: int = 8000) -> dict[str, Any]:
+    content = document.get("normalized_text") or ""
+    metadata = document.get("metadata") or {}
+    published_at = (
+        document.get("published_at")
+        or metadata.get("published_at")
+        or metadata.get("article:published_time")
+        or metadata.get("datePublished")
+    )
+    author = document.get("author_reference") or metadata.get("author")
+    return {
+        "document_id": document.get("id") or document.get("document_id"),
+        "url": document.get("canonical_url"),
+        "title": document.get("title"),
+        "author_metadata": author,
+        "published_at_metadata": published_at,
+        "content_length": len(content),
+        "content_for_evidence_review": content[:max_chars],
+        "review_rule": "Assign a role only after reading. Useful evidence needs an exact passage, verified author, and an absolute source date such as YYYY-MM-DD. Relative dates like '1y ago' are invalid.",
+    }
 
 
 class CandidateInput(BaseModel):
@@ -44,8 +108,19 @@ class CandidateInput(BaseModel):
     source_code: str
     discovery_query: str
     relevance_hint: str
-    evidence_role: str = Field(description="One of buyer_firsthand, solution, counterevidence, context")
     discovery_rank: int | None = None
+
+
+class EvidenceReview(BaseModel):
+    document_id: str
+    useful: bool
+    evidence_role: str = Field(description="One of buyer_firsthand, solution, counterevidence, context, rejected")
+    workflow: str
+    exact_passage: str | None = None
+    source_actor: str | None = None
+    source_date: str | None = None
+    independence_key: str | None = None
+    rejection_reason: str | None = None
 
 
 def prepare_research_context(campaign_code: str, reason: str = "") -> str:
@@ -59,6 +134,7 @@ def prepare_research_context(campaign_code: str, reason: str = "") -> str:
         "unique_document_count": memory["unique_document_count"],
         "topic_coverage": memory["topic_coverage"],
         "studied_queries": memory["studied_queries"],
+        "verified_evidence_memory": memory["verified_evidence_memory"],
         "unresolved_gaps": memory["unresolved_gaps"],
     }
     sources = [
@@ -76,39 +152,62 @@ def prepare_research_context(campaign_code: str, reason: str = "") -> str:
 def search_candidate_urls(
     run_code: str,
     queries: list[str],
-    max_results_per_query: int = 4,
+    max_results_per_query: int = 6,
+    repeat_reason: str = "",
     reason: str = "",
 ) -> str:
-    """Execute the approved query batch once and return compact discovery leads."""
+    """Search in adaptive batches, persist the actual query log, and flag known URLs."""
     run = get_research_run(run_code)
     if not run:
         raise ValueError(f"Unknown research run: {run_code}")
-    plan = (run.get("run_metrics") or {}).get("research_plan") or {}
-    planned = {_normalized_query(item) for item in plan.get("planned_queries") or []}
+    metrics = run.get("run_metrics") or {}
+    plan = metrics.get("research_plan") or {}
+    query_budget = int(plan.get("query_budget") or 0)
+    search_log = list(metrics.get("search_log") or [])
+    prior = [item.get("query", "") for item in search_log]
     cleaned = list(dict.fromkeys(item.strip() for item in queries if item and item.strip()))
-    if any(_normalized_query(item) not in planned for item in cleaned):
-        raise ValueError("All batch queries must be present in the approved research plan.")
-    if len(cleaned) > int(plan.get("query_budget") or 0):
-        raise ValueError("Query batch exceeds the run query budget.")
-    max_results_per_query = max(1, min(int(max_results_per_query), 5))
+    repeated = [
+        query for query in cleaned
+        if any(_normalized_query(query) == _normalized_query(old) or _query_similarity(query, old) >= 0.86 for old in prior)
+    ]
+    if repeated and not repeat_reason.strip():
+        raise ValueError("Query already searched or near-duplicate in this run. Refine it or provide repeat_reason: " + " | ".join(repeated))
+    remaining = max(0, query_budget - len(search_log))
+    if not remaining:
+        raise ValueError("Run query budget is exhausted.")
+    cleaned = cleaned[:remaining]
+    max_results_per_query = max(1, min(int(max_results_per_query), 8))
+    seen_urls = {
+        item.get("canonical_url")
+        for item in list_campaign_documents(plan.get("campaign_code") or run.get("campaign_code") or "CAMP-0001", limit=1000)
+    }
     output: list[dict[str, Any]] = []
     client = DDGS()
     for query in cleaned:
         results = client.text(query, max_results=max_results_per_query)
         compact = []
         for rank, item in enumerate(results or [], start=1):
+            url = item.get("href") or item.get("url")
             compact.append({
                 "rank": rank,
                 "title": item.get("title"),
-                "url": item.get("href") or item.get("url"),
-                "snippet": (item.get("body") or item.get("snippet") or "")[:180],
+                "url": url,
+                "already_in_campaign_memory": url in seen_urls,
+                "snippet": (item.get("body") or item.get("snippet") or "")[:500],
             })
         output.append({"query": query, "results": compact})
+        search_log.append({
+            "query": query,
+            "result_count": len(compact),
+            "repeat_reason": repeat_reason.strip() or None,
+        })
+    update_research_run(run_code, run_metrics={"search_log": search_log}, merge_metrics=True)
     return _json({
         "run_code": run_code,
-        "executed_queries": cleaned,
+        "queries_executed_by_tool": cleaned,
+        "query_budget_remaining": query_budget - len(search_log),
         "result_batches": output,
-        "rule": "Results are discovery leads only. Choose original sources; snippets are not evidence.",
+        "rule": "Snippets are leads only. Collect candidates, read returned content, then review evidence. Refine the next query when coverage is weak.",
     })
 
 
@@ -117,7 +216,7 @@ def collect_candidate_batch(
     candidates: list[CandidateInput],
     reason: str = "",
 ) -> str:
-    """Check novelty and collect a bounded candidate batch without another model turn per URL."""
+    """Collect candidates within the budget and return source content for evidence review."""
     run = get_research_run(run_code)
     if not run:
         raise ValueError(f"Unknown research run: {run_code}")
@@ -134,12 +233,7 @@ def collect_candidate_batch(
         source_code = candidate.source_code.strip()
         query = candidate.discovery_query.strip()
         hint = candidate.relevance_hint.strip()
-        role = candidate.evidence_role.strip().lower()
         rank = candidate.discovery_rank
-        if role not in {"buyer_firsthand", "solution", "counterevidence", "context"}:
-            results.append({"decision": "REJECTED_INPUT", "url": url, "reason": "invalid evidence_role"})
-            continue
-        tagged_hint = f"[{role}] {hint}"
         if source_code not in allowed_sources:
             results.append({"decision": "REJECTED_INPUT", "url": url, "reason": f"source {source_code} is outside run scope"})
             continue
@@ -147,9 +241,10 @@ def collect_candidate_batch(
         if existing:
             attach_document_to_run(
                 run_code=run_code, document_id=existing["id"],
-                discovery_query=query, discovery_rank=rank, relevance_hint=tagged_hint,
+                discovery_query=query, discovery_rank=rank,
+                relevance_hint=f"[unreviewed] {hint}",
             )
-            results.append({"decision": "REUSED", "url": existing["canonical_url"], "document_id": existing["id"], "title": existing.get("title")})
+            results.append({"decision": "REUSED", **_document_preview(existing)})
             remaining -= 1
             continue
         try:
@@ -168,22 +263,128 @@ def collect_candidate_batch(
             )
             attach_document_to_run(
                 run_code=run_code, document_id=stored["document_id"],
-                discovery_query=query, discovery_rank=rank, relevance_hint=tagged_hint,
+                discovery_query=query, discovery_rank=rank,
+                relevance_hint=f"[unreviewed] {hint}",
             )
-            results.append({
-                "decision": "STORED", "url": stored["canonical_url"],
-                "document_id": stored["document_id"], "title": stored.get("title"),
-                "visible_length": visible_length,
-            })
+            document = get_document_by_id(stored["document_id"]) or {
+                **stored, "id": stored["document_id"], "normalized_text": markdown or html,
+            }
+            results.append({"decision": "STORED", **_document_preview(document)})
             remaining -= 1
         except Exception as exc:
             results.append({"decision": "FAILED", "url": url, "error": str(exc)[:300]})
     return _json({
         "run_code": run_code,
-        "document_budget": budget,
+        "document_budget_ceiling": budget,
+        "document_budget_remaining": max(0, budget - len(list_run_documents(run_code))),
         "documents_before_batch": existing_count,
         "documents_after_batch": len(list_run_documents(run_code)),
         "results": results,
+        "next_action": "Read content_for_evidence_review and call review_collected_evidence. Search again with refined queries if evidence is weak and budget remains.",
+    })
+
+
+def review_collected_evidence(
+    run_code: str,
+    reviews: list[EvidenceReview],
+    reason: str = "",
+) -> str:
+    """Verify exact passages against stored content and persist post-read evidence reviews."""
+    run = get_research_run(run_code)
+    if not run:
+        raise ValueError(f"Unknown research run: {run_code}")
+    linked_ids = {item.get("id") for item in list_run_documents(run_code)}
+    metrics = run.get("run_metrics") or {}
+    stored_reviews = {
+        item.get("document_id"): item
+        for item in metrics.get("evidence_reviews") or []
+        if item.get("document_id")
+    }
+    results: list[dict[str, Any]] = []
+    allowed_roles = {"buyer_firsthand", "solution", "counterevidence", "context", "rejected"}
+    for review in reviews:
+        if review.document_id not in linked_ids:
+            results.append({"document_id": review.document_id, "accepted": False, "reason": "document is not linked to this run"})
+            continue
+        role = review.evidence_role.strip().lower()
+        document = get_document_by_id(review.document_id)
+        if not document or role not in allowed_roles:
+            results.append({"document_id": review.document_id, "accepted": False, "reason": "missing document or invalid role"})
+            continue
+        useful = bool(review.useful and role != "rejected")
+        content_normalized = _normalized_text(document.get("normalized_text") or "")
+        passage = (review.exact_passage or "").strip()
+        passage_verified = bool(passage and _normalized_text(passage) in content_normalized)
+        metadata = document.get("metadata") or {}
+        metadata_date = _iso_source_date(str(
+            document.get("published_at")
+            or metadata.get("published_at")
+            or metadata.get("article:published_time")
+            or metadata.get("datePublished")
+            or ""
+        ))
+        source_date_iso = _iso_source_date(review.source_date)
+        date_verified = bool(
+            source_date_iso
+            and (
+                source_date_iso == metadata_date
+                or _normalized_text(review.source_date) in content_normalized
+            )
+        )
+        actor = _actor_key(review.source_actor)
+        metadata_actor = _actor_key(str(document.get("author_reference") or metadata.get("author") or ""))
+        actor_verified = bool(actor and (actor == metadata_actor or actor in content_normalized))
+        complete = bool(
+            useful
+            and passage_verified
+            and actor_verified
+            and date_verified
+            and review.workflow.strip()
+            and (review.independence_key or "").strip()
+        )
+        if useful and not complete:
+            results.append({
+                "document_id": review.document_id,
+                "accepted": False,
+                "reason": "useful evidence requires verified passage, workflow, identifiable actor, absolute source date, and independence_key",
+                "passage_verified": passage_verified,
+                "actor_verified": actor_verified,
+                "date_verified": date_verified,
+                "metadata_date": metadata_date,
+            })
+            continue
+        stored = {
+            "document_id": review.document_id,
+            "url": document.get("canonical_url"),
+            "title": document.get("title"),
+            "useful": useful,
+            "evidence_role": role if useful else "rejected",
+            "workflow": review.workflow.strip(),
+            "exact_passage": passage if passage_verified else "",
+            "passage_verified": passage_verified,
+            "source_actor": (review.source_actor or "").strip(),
+            "actor_key": actor,
+            "actor_verified": actor_verified,
+            "source_date": source_date_iso or "",
+            "date_verified": date_verified,
+            "independence_key": (review.independence_key or "").strip(),
+            "rejection_reason": (review.rejection_reason or "").strip(),
+            "review_origin": "MARKET_SCOUT_POST_READ",
+        }
+        stored_reviews[review.document_id] = stored
+        results.append({"document_id": review.document_id, "accepted": True, "useful": useful, "role": stored["evidence_role"]})
+    review_list = list(stored_reviews.values())
+    update_research_run(run_code, run_metrics={"evidence_reviews": review_list}, merge_metrics=True)
+    return _json({
+        "run_code": run_code,
+        "results": results,
+        "reviewed_document_count": len(review_list),
+        "verified_useful_count": sum(
+            1 for item in review_list
+            if item.get("useful") and item.get("passage_verified")
+            and item.get("actor_verified") and item.get("date_verified")
+        ),
+        "next_action": "Search and collect again if two independent buyer accounts for the same workflow are not yet verified and budgets remain.",
     })
 
 
@@ -210,6 +411,7 @@ def get_campaign_research_memory(campaign_code: str, reason: str = "") -> str:
     runs = list_campaign_runs(campaign_code, limit=100)
     documents = list_campaign_documents(campaign_code, limit=1000)
     studied_queries: list[str] = []
+    verified_evidence_memory: list[dict[str, Any]] = []
     coverage: dict[str, dict[str, Any]] = {}
     unresolved_gaps: list[str] = []
     for run in runs:
@@ -223,9 +425,29 @@ def get_campaign_research_memory(campaign_code: str, reason: str = "") -> str:
             bucket["validity"].append(run["validity"])
         if bucket["last_run"] is None:
             bucket["last_run"] = run["code"]
-        for query in (plan.get("planned_queries") or []) + (metrics.get("executed_queries") or []):
+        logged_queries = [item.get("query") for item in metrics.get("search_log") or []]
+        for query in (plan.get("planned_queries") or []) + (metrics.get("executed_queries") or []) + logged_queries:
             if query and query not in studied_queries:
                 studied_queries.append(query)
+        for evidence in metrics.get("evidence_reviews") or []:
+            if (
+                evidence.get("useful")
+                and evidence.get("passage_verified")
+                and evidence.get("actor_verified")
+                and evidence.get("date_verified")
+            ):
+                verified_evidence_memory.append({
+                    "run_code": run.get("code"),
+                    "focus_topic": topic,
+                    "document_id": evidence.get("document_id"),
+                    "url": evidence.get("url"),
+                    "evidence_role": evidence.get("evidence_role"),
+                    "workflow": evidence.get("workflow"),
+                    "source_actor": evidence.get("source_actor"),
+                    "source_date": evidence.get("source_date"),
+                    "independence_key": evidence.get("independence_key"),
+                    "exact_passage": evidence.get("exact_passage"),
+                })
         for gap in metrics.get("unresolved_gaps") or []:
             if gap and gap not in unresolved_gaps:
                 unresolved_gaps.append(gap)
@@ -235,6 +457,7 @@ def get_campaign_research_memory(campaign_code: str, reason: str = "") -> str:
         "unique_document_count": len(documents),
         "topic_coverage": coverage,
         "studied_queries": studied_queries,
+        "verified_evidence_memory": verified_evidence_memory[-50:],
         "unresolved_gaps": unresolved_gaps,
         "seen_urls": [{"url": d.get("canonical_url"), "title": d.get("title"), "status": d.get("status")} for d in documents],
         "instruction": "Choose an uncovered or incomplete topic. Reuse an exact query only with a repeat_reason. Check each URL before fetch.",
@@ -250,7 +473,7 @@ def begin_planned_research_run(
     source_codes: list[str],
     query_budget: int = 6,
     document_budget: int = 10,
-    mode: str = "DISCOVERY",
+    mode: Literal["DISCOVERY", "HYPOTHESIS", "DEEP_DIVE", "MONITORING"] = "DISCOVERY",
     repeat_reason: str = "",
     reason: str = "",
 ) -> str:
@@ -266,16 +489,24 @@ def begin_planned_research_run(
         raise ValueError("At least one planned query is required.")
     if len(planned_queries) > query_budget:
         raise ValueError("planned_queries exceeds query_budget.")
-    prior_queries: set[str] = set()
+    prior_queries: list[str] = []
     for run in list_campaign_runs(campaign_code, limit=100):
         metrics = run.get("run_metrics") or {}
-        plan = metrics.get("research_plan") or {}
-        for query in (plan.get("planned_queries") or []) + (metrics.get("executed_queries") or []):
-            prior_queries.add(_normalized_query(query))
-    repeated = [query for query in planned_queries if _normalized_query(query) in prior_queries]
+        prior_plan = metrics.get("research_plan") or {}
+        logged = [item.get("query") for item in metrics.get("search_log") or []]
+        prior_queries.extend(
+            query for query in
+            (prior_plan.get("planned_queries") or []) + (metrics.get("executed_queries") or []) + logged
+            if query
+        )
+    repeated = [
+        query for query in planned_queries
+        if any(_normalized_query(query) == _normalized_query(old) or _query_similarity(query, old) >= 0.86 for old in prior_queries)
+    ]
     if repeated and not repeat_reason.strip():
-        raise ValueError("Exact queries already used. Change them or provide repeat_reason: " + " | ".join(repeated))
+        raise ValueError("Queries already used or near-duplicates. Refine them or provide repeat_reason: " + " | ".join(repeated))
     research_plan = {
+        "campaign_code": campaign_code,
         "focus_topic": focus_topic,
         "objective": objective,
         "planned_queries": planned_queries,
@@ -373,12 +604,12 @@ def get_research_run_status(run_code: str, reason: str = "") -> str:
 def finish_research_run(
     run_code: str,
     useful_notes: str,
-    executed_queries: list[str],
-    coverage_summary: dict[str, Any],
+    coverage_summary: str,
     unresolved_gaps: list[str],
+    stop_reason: str,
     reason: str = "",
 ) -> str:
-    """Close a run using stored counts and deterministic completeness checks."""
+    """Close a run from database logs and post-read reviews, never from self-reported counts."""
     run = get_research_run(run_code)
     if not run:
         raise ValueError(f"Unknown research run: {run_code}")
@@ -386,37 +617,59 @@ def finish_research_run(
     usable = [item for item in documents if item.get("status") not in {"FAILED", "IGNORED"}]
     metrics = run.get("run_metrics") or {}
     plan = metrics.get("research_plan") or {}
-    query_budget = int(plan.get("query_budget") or 0)
-    document_budget = int(plan.get("document_budget") or 0)
-    executed = list(dict.fromkeys(item.strip() for item in executed_queries if item.strip()))
-    planned = {_normalized_query(item) for item in plan.get("planned_queries") or []}
-    unplanned = [item for item in executed if _normalized_query(item) not in planned]
+    search_log = metrics.get("search_log") or []
+    reviews = metrics.get("evidence_reviews") or []
+    linked_ids = {item.get("id") for item in usable}
+    verified = [
+        item for item in reviews
+        if item.get("document_id") in linked_ids
+        and item.get("useful")
+        and item.get("passage_verified")
+        and item.get("actor_verified")
+        and item.get("date_verified")
+    ]
     role_counts = {"buyer_firsthand": 0, "solution": 0, "counterevidence": 0, "context": 0}
-    for item in usable:
-        hint = item.get("relevance_hint") or ""
-        for role in role_counts:
-            if hint.startswith(f"[{role}]"):
-                role_counts[role] += 1
-                break
-    if not usable:
+    buyer_workflows: dict[str, set[str]] = {}
+    for item in verified:
+        role = item.get("evidence_role")
+        if role in role_counts:
+            role_counts[role] += 1
+        if role == "buyer_firsthand":
+            workflow = _normalized_text(item.get("workflow") or "")
+            independent_actor = item.get("actor_key") or _actor_key(item.get("source_actor") or "")
+            if workflow and independent_actor:
+                buyer_workflows.setdefault(workflow, set()).add(independent_actor)
+    qualified_workflows = [
+        workflow for workflow, independent_sources in buyer_workflows.items()
+        if len(independent_sources) >= 2
+    ]
+    reviewed_ids = {item.get("document_id") for item in reviews}
+    unreviewed_ids = sorted(item for item in linked_ids if item not in reviewed_ids)
+    if not usable or not reviews:
         validity = "INVALID"
-    elif (
-        len(usable) < document_budget
-        or len(executed) < min(query_budget, len(planned))
-        or role_counts["buyer_firsthand"] < 1
-    ):
-        validity = "PARTIAL"
-    else:
+    elif qualified_workflows:
         validity = "VALID"
+    else:
+        validity = "PARTIAL"
+    executed = [item.get("query") for item in search_log if item.get("query")]
     closed = {
-        "documents_linked": len(documents), "usable_documents": len(usable),
-        "executed_queries": executed, "unplanned_queries": unplanned,
-        "coverage_summary": coverage_summary, "unresolved_gaps": unresolved_gaps,
-        "market_scout_notes": useful_notes, "evidence_role_counts": role_counts,
+        "documents_linked": len(documents),
+        "usable_documents": len(usable),
+        "executed_queries": executed,
+        "coverage_summary": coverage_summary,
+        "unresolved_gaps": unresolved_gaps,
+        "market_scout_notes": useful_notes,
+        "stop_reason": stop_reason,
+        "evidence_role_counts": role_counts,
+        "qualified_workflows": qualified_workflows,
+        "unreviewed_document_ids": unreviewed_ids,
         "completion_check": {
-            "query_target": query_budget, "document_target": document_budget,
-            "query_count": len(executed), "document_count": len(usable),
-            "counted_from_database": True,
+            "query_budget_ceiling": int(plan.get("query_budget") or 0),
+            "document_budget_ceiling": int(plan.get("document_budget") or 0),
+            "queries_executed_from_tool_log": len(executed),
+            "documents_counted_from_database": len(usable),
+            "verified_evidence_count": len(verified),
+            "valid_requires_two_independent_buyer_accounts_same_workflow": True,
         },
     }
     updated = update_research_run(
@@ -424,10 +677,15 @@ def finish_research_run(
         merge_metrics=True, mark_completed=True,
     )
     return _json({
-        "run_code": updated["code"], "status": updated["status"],
+        "run_code": updated["code"],
+        "status": updated.get("status", "COMPLETED"),
         "validity_computed": validity,
+        "validity_meaning": "VALID means collection has two verified independent buyer accounts for at least one exact workflow; human QA is still required.",
         "actual_document_count": len(documents),
         "usable_document_count": len(usable),
+        "verified_evidence_count": len(verified),
         "evidence_role_counts": role_counts,
-        "unplanned_queries": unplanned,
+        "qualified_workflows": qualified_workflows,
+        "unreviewed_document_ids": unreviewed_ids,
+        "queries_executed_from_tool_log": executed,
     })
