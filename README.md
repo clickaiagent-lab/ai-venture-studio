@@ -58,3 +58,9 @@ Key rule: raw crawled content and unreviewed AI signals never become AVS Opportu
 Technical contract:
 - `docs/MIE_AVS_DATA_CONTRACT_V0_1.md`
 - `docs/MARKET_INTELLIGENCE_ENGINE_V0_1.md`
+
+## Market Scout v0.2
+
+- Runtime and Agno UI guide: `docs/MIE_RUNTIME_V0_2.md`
+- Local MIE start page: `http://localhost:8000/mie`
+- Agno Control Plane endpoint: `http://localhost:8000`

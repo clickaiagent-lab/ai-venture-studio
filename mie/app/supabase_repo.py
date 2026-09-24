@@ -3,16 +3,32 @@ from __future__ import annotations
 import hashlib
 from datetime import datetime, timezone
 from typing import Any
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from supabase import Client, create_client
 
 from app.settings import get_settings
 
 _client: Client | None = None
+_TRACKING_QUERY_PREFIXES = ("utm_",)
+_TRACKING_QUERY_KEYS = {"fbclid", "gclid", "mc_cid", "mc_eid", "ref", "source"}
 
 
 def _utcnow() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def canonicalize_url(url: str) -> str:
+    value = (url or "").strip()
+    parts = urlsplit(value)
+    query = [
+        (key, item)
+        for key, item in parse_qsl(parts.query, keep_blank_values=True)
+        if key.lower() not in _TRACKING_QUERY_KEYS
+        and not key.lower().startswith(_TRACKING_QUERY_PREFIXES)
+    ]
+    path = parts.path.rstrip("/") or "/"
+    return urlunsplit((parts.scheme.lower(), parts.netloc.lower(), path, urlencode(query, doseq=True), ""))
 
 
 def get_client() -> Client:
@@ -91,6 +107,7 @@ def ensure_research_run(
     research_query: str,
     source_codes: list[str],
     mode: str = "DISCOVERY",
+    initial_metrics: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     existing = get_research_run(run_code)
     if existing:
@@ -107,10 +124,11 @@ def ensure_research_run(
         "objective": objective,
         "research_query": research_query,
         "source_scope": source_codes,
-        "orchestrator": "Agno-Market-Scout-v0.1",
+        "orchestrator": "Agno-Market-Scout-v0.2",
         "model_name": get_settings().mie_model,
-        "prompt_version": "market-scout-v0.1",
+        "prompt_version": "market-scout-v0.2",
         "status": "DRAFT",
+        "run_metrics": initial_metrics or {},
         "created_by_type": "AGENT",
         "created_by_id": "market-scout",
     }
@@ -126,6 +144,7 @@ def update_research_run(
     status: str | None = None,
     validity: str | None = None,
     run_metrics: dict[str, Any] | None = None,
+    merge_metrics: bool = False,
     mark_started: bool = False,
     mark_completed: bool = False,
 ) -> dict[str, Any]:
@@ -135,7 +154,15 @@ def update_research_run(
     if validity is not None:
         payload["validity"] = validity
     if run_metrics is not None:
-        payload["run_metrics"] = run_metrics
+        if merge_metrics:
+            current = get_research_run(run_code)
+            if not current:
+                raise ValueError(f"Unknown research run: {run_code}")
+            metrics = dict(current.get("run_metrics") or {})
+            metrics.update(run_metrics)
+            payload["run_metrics"] = metrics
+        else:
+            payload["run_metrics"] = run_metrics
     if mark_started:
         payload["started_at"] = _utcnow()
     if mark_completed:
@@ -177,6 +204,7 @@ def store_document(
     if not source:
         raise ValueError(f"Unknown MIE source: {source_code}")
 
+    canonical_url = canonicalize_url(canonical_url)
     content_for_hash = normalized_text or raw_text
     content_hash = hashlib.sha256(
         content_for_hash.encode("utf-8", errors="ignore")
@@ -201,6 +229,7 @@ def store_document(
             "canonical_url": canonical_url,
             "external_id": external_id,
             "title": title,
+            "author_reference": (metadata or {}).get("author"),
             "fetched_at": _utcnow(),
             "fetch_method": fetch_method,
             "raw_text": raw_text,
@@ -229,3 +258,96 @@ def store_document(
         "deduplicated": deduplicated,
         "title": document.get("title") or title,
     }
+
+
+def list_campaign_runs(campaign_code: str, limit: int = 50) -> list[dict[str, Any]]:
+    campaign = get_campaign_by_code(campaign_code)
+    if not campaign:
+        raise ValueError(f"Unknown AVS campaign: {campaign_code}")
+    result = (
+        get_client().table("mie_research_runs")
+        .select("id,code,mode,objective,research_query,source_scope,status,validity,run_metrics,started_at,completed_at,created_at,orchestrator,prompt_version")
+        .eq("campaign_id", campaign["id"]).order("created_at", desc=True)
+        .limit(max(1, min(limit, 100))).execute()
+    )
+    return result.data or []
+
+
+def list_campaign_documents(campaign_code: str, limit: int = 500) -> list[dict[str, Any]]:
+    runs = list_campaign_runs(campaign_code, limit=100)
+    run_ids = [item["id"] for item in runs]
+    if not run_ids:
+        return []
+    links = (
+        get_client().table("mie_run_documents")
+        .select("research_run_id,document_id,discovery_query,discovery_rank,relevance_hint")
+        .in_("research_run_id", run_ids).limit(max(1, min(limit, 1000))).execute()
+    ).data or []
+    ids = list({item["document_id"] for item in links})
+    if not ids:
+        return []
+    documents = (
+        get_client().table("mie_documents")
+        .select("id,source_id,canonical_url,title,author_reference,published_at,fetched_at,status,metadata")
+        .in_("id", ids).limit(max(1, min(limit, 1000))).execute()
+    ).data or []
+    link_map: dict[str, list[dict[str, Any]]] = {}
+    for link in links:
+        link_map.setdefault(link["document_id"], []).append(link)
+    for document in documents:
+        document["run_links"] = link_map.get(document["id"], [])
+    return documents
+
+
+def find_document_by_url(url: str) -> dict[str, Any] | None:
+    target = canonicalize_url(url)
+    result = (
+        get_client().table("mie_documents")
+        .select("id,canonical_url,content_hash,title,status,fetched_at,metadata")
+        .limit(1000).execute()
+    )
+    for item in result.data or []:
+        if canonicalize_url(item.get("canonical_url") or "") == target:
+            return item
+    return None
+
+
+def attach_document_to_run(
+    *, run_code: str, document_id: str, discovery_query: str | None = None,
+    discovery_rank: int | None = None, relevance_hint: str | None = None,
+) -> None:
+    run = get_research_run(run_code)
+    if not run:
+        raise ValueError(f"Unknown research run: {run_code}")
+    get_client().table("mie_run_documents").upsert(
+        {"research_run_id": run["id"], "document_id": document_id,
+         "discovery_query": discovery_query, "discovery_rank": discovery_rank,
+         "relevance_hint": relevance_hint},
+        on_conflict="research_run_id,document_id",
+    ).execute()
+
+
+def list_run_documents(run_code: str) -> list[dict[str, Any]]:
+    run = get_research_run(run_code)
+    if not run:
+        raise ValueError(f"Unknown research run: {run_code}")
+    links = (
+        get_client().table("mie_run_documents")
+        .select("document_id,discovery_query,discovery_rank,relevance_hint,added_at")
+        .eq("research_run_id", run["id"]).execute()
+    ).data or []
+    ids = [item["document_id"] for item in links]
+    if not ids:
+        return []
+    documents = (
+        get_client().table("mie_documents")
+        .select("id,source_id,canonical_url,title,status,fetched_at,metadata")
+        .in_("id", ids).execute()
+    ).data or []
+    by_id = {item["id"]: item for item in documents}
+    output = []
+    for link in links:
+        item = dict(by_id.get(link["document_id"], {}))
+        item.update({key: link.get(key) for key in ("discovery_query","discovery_rank","relevance_hint","added_at")})
+        output.append(item)
+    return output
