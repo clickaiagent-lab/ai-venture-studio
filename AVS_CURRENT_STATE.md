@@ -3,7 +3,7 @@
 > Operational checkpoint for AI Venture Studio. Keep only the latest agreed state here; do not use this as a history log.  
 > Update at the end of each important Chat/Work session. Never add credentials, private infrastructure identifiers, or machine-specific paths.
 
-**Last updated:** 2026-09-24
+**Last updated:** 2026-09-25
 
 ---
 
@@ -11,18 +11,23 @@
 
 **Current Campaign:** CAMP-0001 — E-commerce Campaign #001  
 **Current Phase:** Step 03 — FIND  
-**Objective:** Find and validate one narrow, recurring, economically meaningful problem with reachable global SMB/prosumer buyers before building.
+**Business scope (founder decision, 2026-09-25):** E-commerce only, with two intended business tracks: (1) sell AI, Agent and Automation products to E-commerce businesses; (2) the founder directly sells physical handmade goods on marketplaces such as Etsy or Amazon. Exact products, production model, first marketplace, budget and allocation between tracks remain undecided.
+
+**Current B2B objective:** Find and validate one narrow, recurring, economically meaningful problem with reachable global SMB/prosumer buyers before building.
+
+**Handmade commerce objective:** Select and test a viable physical handmade product offer for the founder's own selling business. No product niche or launch has been approved yet.
 
 ## CURRENT STEP
 
-**Step:** Market Scout v0.3 repair and stability acceptance passed; continue bounded autonomous topic coverage with human QA.
+**Step:** Align the next research brief with the founder's E-commerce-only, two-track direction before the next autonomous research run. Market Scout v0.3 repair and acceptance were completed in the prior session.
 
-**Current output:** Market Scout v0.3 is committed and running. It reads stored source content before classification, supports bounded adaptive search/collection/review rounds, verifies exact passages, actors and absolute dates, remembers verified evidence, rejects near-duplicate queries, and derives closure metrics from Supabase. Acceptance Runs #013–#015 exposed and fixed invalid mode values, inferred relative dates and nullable review fields. Final Run #016 completed in 120.83 seconds with 1 query, 2 documents, 14 trace spans, zero trace errors and 79,510 tokens. It verified two independently authored buyer accounts for the same chargeback workflow. Human QA marked it VALID_FOR_COLLECTION while withholding approval of unsupported narrative claims; solution and counterevidence coverage is still missing. Twelve Signals remain PENDING; no cluster or AVS promotion.
+**Current output:** The founder has confirmed the two business tracks above; strategy advice is being discussed, not yet an approved product or launch plan. The last technical acceptance on 2026-09-24 confirmed Market Scout v0.3 was committed and running. It reads stored source content before classification, supports bounded adaptive search/collection/review rounds, verifies exact passages, actors and absolute dates, remembers verified evidence, rejects near-duplicate queries, and derives closure metrics from Supabase. Acceptance Runs #013–#015 exposed and fixed invalid mode values, inferred relative dates and nullable review fields. Final Run #016 completed in 120.83 seconds with 1 query, 2 documents, 14 trace spans, zero trace errors and 79,510 tokens. It verified two independently authored buyer accounts for the same chargeback workflow. Human QA marked it VALID_FOR_COLLECTION while withholding approval of unsupported narrative claims; solution and counterevidence coverage is still missing. Twelve Signals remain PENDING; no cluster or AVS promotion.
 
 **Success condition:** Establish at least two independent, exact-workflow buyer accounts per candidate with dated original context; verify frequency, financial/labor impact and present workaround or paid tool before proposing any Signal approval.
 
 ## DONE
 
+- Founder confirmed on 2026-09-25 that AVS focuses exclusively on E-commerce, with both a B2B AI/Agent/Automation product business and a direct physical handmade selling business. Marketplace examples are Etsy and Amazon; no first channel or product has been chosen.
 - AVS Core Steps 01–08 and the Master Operating Flow defined.
 - AVS Central Memory deployed.
 - CAMP-0001 created.
@@ -68,7 +73,8 @@
 
 ## PENDING
 
-- Continue bounded autonomous coverage of uncovered E-commerce topics, using a default ceiling of 4 search queries and 6 collected documents per run.
+- Clarify the handmade production role (self/team making, original design with a production partner, or sourcing finished goods), available craft/design capability and suppliers, test budget, and time allocation. Then define the next research brief for the two business tracks. Etsy-first and a shared handmade/personalization focus are recommendations under discussion, not approved decisions.
+- Resume bounded autonomous E-commerce research after the brief is aligned, using the existing default ceiling of 4 search queries and 6 collected documents per run.
 - Extend the Run #016 chargeback workflow with current solution and counterevidence, native Shopify chargeback tooling, frequency, quantified labor or loss, and current paid/manual workarounds before proposing a Signal.
 - Optimize the evidence preview into query-focused excerpts so the model does not repeatedly process broad source text; retain full normalized documents in Supabase.
 - Backfill topic labels for useful legacy Runs #001–#008 only if needed for coverage planning; currently they appear as `legacy_unclassified`.
@@ -78,16 +84,18 @@
 
 ## BLOCKER
 
-No model, Supabase, Crawl4AI, AgentOS UI, runtime, or autonomous-discovery blocker.
+No technical blocker was recorded at the last acceptance on 2026-09-24; no new runtime check was performed in this strategy session. The next commercial choice depends on the founder's production role, supply capability, available time and test budget.
 
 Quality limitations remain: some sources expose only relative or missing dates and must be rejected; workflow identity and author independence still require human QA; Run #016 has no solution or counterevidence; token use is still high because broad source previews are reprocessed. A v0.3 VALID result is a collection threshold, not niche validation. Human QA remains mandatory before Signal approval, clustering, or AVS promotion.
 
 ## NEXT
 
-Let Market Scout autonomously cover the next uncovered E-commerce topic with a bounded 4-query / 6-document run. Require two verified, independently authored buyer accounts for the same narrow workflow, plus solution or counterevidence where available. Assistant then checks exact passages, actors, dates, workflow identity, claimed impact and competing solutions; do not manually hunt URLs for Market Scout. Keep all 12 Signals PENDING until human review; create no cluster or AVS promotion.
+Clarify the founder's handmade production role and available resources, then agree a focused research brief for the two E-commerce business tracks. Keep product-demand evidence for handmade goods distinct from seller-workflow evidence for B2B software; existing seller-pain records do not validate a physical product. After the brief is set, Market Scout owns bounded discovery and collection, the assistant performs QA/analysis, and the founder makes commercial approval decisions. Keep all 12 existing Signals PENDING; no product launch, cluster or AVS promotion is approved by this strategy discussion.
 
 ## IMPORTANT DECISIONS / INVARIANTS
 
+- AVS business scope is exclusively E-commerce (founder decision, 2026-09-25).
+- Both business tracks are intended: AI/Agent/Automation products for E-commerce sellers and the founder's own physical handmade selling business. Neither track replaces the other. Their detailed commercial focus and execution sequence remain to be agreed.
 - Do not redesign AVS Core before running real campaigns.
 - One experiment/week is more important than one app/week.
 - AVS is the operating system; tools are replaceable.
