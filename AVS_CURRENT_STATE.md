@@ -19,14 +19,17 @@
 
 ## CURRENT STEP
 
-**Step:** Align the next research brief with the founder's E-commerce-only, two-track direction before the next autonomous research run. Market Scout v0.3 repair and acceptance were completed in the prior session.
+**Step:** Define the smallest MIE extension that reuses Market Scout for Etsy/handmade niche research and practical E-commerce experience research. The founder rejected a fixed six-week preparation plan and wants short research-to-product-to-shipping iterations. Detailed feature scope is still being discussed.
 
-**Current output:** The founder has confirmed the two business tracks above; strategy advice is being discussed, not yet an approved product or launch plan. The last technical acceptance on 2026-09-24 confirmed Market Scout v0.3 was committed and running. It reads stored source content before classification, supports bounded adaptive search/collection/review rounds, verifies exact passages, actors and absolute dates, remembers verified evidence, rejects near-duplicate queries, and derives closure metrics from Supabase. Acceptance Runs #013–#015 exposed and fixed invalid mode values, inferred relative dates and nullable review fields. Final Run #016 completed in 120.83 seconds with 1 query, 2 documents, 14 trace spans, zero trace errors and 79,510 tokens. It verified two independently authored buyer accounts for the same chargeback workflow. Human QA marked it VALID_FOR_COLLECTION while withholding approval of unsupported narrative claims; solution and counterevidence coverage is still missing. Twelve Signals remain PENDING; no cluster or AVS promotion.
+**Current output:** The founder confirmed the two business tracks and clarified that existing MIE/Market Scout must support the handmade business directly. Required research includes physical product niches and actionable experience shared by real E-commerce operators, not textbook learning. Two supplied screenshots introduce crochet/charm hypotheses (seasonal outfits, personality customization, fast trend response and pattern PDFs); their pricing, competitor and demand claims are unverified seeds, not validated market evidence. A proposed Handmade Business function inside MIE is under discussion; no new feature or product launch has been implemented or approved by this discussion. The last technical acceptance on 2026-09-24 confirmed Market Scout v0.3 was committed and running. It reads stored source content before classification, supports bounded adaptive search/collection/review rounds, verifies exact passages, actors and absolute dates, remembers verified evidence, rejects near-duplicate queries, and derives closure metrics from Supabase. Acceptance Runs #013–#015 exposed and fixed invalid mode values, inferred relative dates and nullable review fields. Final Run #016 completed in 120.83 seconds with 1 query, 2 documents, 14 trace spans, zero trace errors and 79,510 tokens. It verified two independently authored buyer accounts for the same chargeback workflow. Human QA marked it VALID_FOR_COLLECTION while withholding approval of unsupported narrative claims; solution and counterevidence coverage is still missing. Twelve Signals remain PENDING; no cluster or AVS promotion.
 
-**Success condition:** Establish at least two independent, exact-workflow buyer accounts per candidate with dated original context; verify frequency, financial/labor impact and present workaround or paid tool before proposing any Signal approval.
+**Existing B2B success condition:** Establish at least two independent, exact-workflow buyer accounts per candidate with dated original context; verify frequency, financial/labor impact and present workaround or paid tool before proposing any Signal approval.
+
+**New research requirement:** Define separate evidence and completion criteria for handmade product research and practical operator experience. The existing two-buyer/same-workflow rule must not be presented as physical-product demand validation or a test of an operating lesson.
 
 ## DONE
 
+- Founder clarified on 2026-09-25: reject the proposed fixed six-week preparation period; reuse MIE/Market Scout for immediate, bounded research-to-product-to-shipping work, and include research into practical E-commerce operating experience. The screenshots were inspected as hypothesis inputs, and current source code was checked: briefs and run validity are still oriented toward B2B seller workflows.
 - Founder confirmed on 2026-09-25 that AVS focuses exclusively on E-commerce, with both a B2B AI/Agent/Automation product business and a direct physical handmade selling business. Marketplace examples are Etsy and Amazon; no first channel or product has been chosen.
 - AVS Core Steps 01–08 and the Master Operating Flow defined.
 - AVS Central Memory deployed.
@@ -73,8 +76,10 @@
 
 ## PENDING
 
-- Clarify the handmade production role (self/team making, original design with a production partner, or sourcing finished goods), available craft/design capability and suppliers, test budget, and time allocation. Then define the next research brief for the two business tracks. Etsy-first and a shared handmade/personalization focus are recommendations under discussion, not approved decisions.
-- Resume bounded autonomous E-commerce research after the brief is aligned, using the existing default ceiling of 4 search queries and 6 collected documents per run.
+- Discuss and implement the minimum Handmade Business research function within the existing MIE: product-niche research and practical operator-experience research, each with its own brief, evidence fields and completion rules. This is proposed scope, not an already available capability.
+- Retain the B2B AI/Agent/Automation research path. Shared source documents may be reused, while research purpose, coverage, gaps and conclusions remain distinguishable.
+- Use the supplied crochet/charm examples as potential first research seeds; no crochet niche, Etsy launch, production arrangement, budget or time split is approved. Unknown supply/cost constraints should be recorded and resolved when needed for the next commercial action, rather than imposing a long preparation phase.
+- Start bounded autonomous research once the minimal brief and capability are ready. The existing 4-query / 6-document example is a collection budget, not a requirement that every decision or new research type can be resolved by one such batch.
 - Extend the Run #016 chargeback workflow with current solution and counterevidence, native Shopify chargeback tooling, frequency, quantified labor or loss, and current paid/manual workarounds before proposing a Signal.
 - Optimize the evidence preview into query-focused excerpts so the model does not repeatedly process broad source text; retain full normalized documents in Supabase.
 - Backfill topic labels for useful legacy Runs #001–#008 only if needed for coverage planning; currently they appear as `legacy_unclassified`.
@@ -84,17 +89,20 @@
 
 ## BLOCKER
 
-No technical blocker was recorded at the last acceptance on 2026-09-24; no new runtime check was performed in this strategy session. The next commercial choice depends on the founder's production role, supply capability, available time and test budget.
+No technical runtime blocker was recorded at the last acceptance on 2026-09-24; no new live runtime check was performed in this strategy session. Capability gap: the code currently uses B2B seller-workflow briefs and a two-independent-buyer validity gate. Dedicated handmade-product and practical-experience research modes, source access, evidence criteria and result views have not yet been implemented or tested.
 
 Quality limitations remain: some sources expose only relative or missing dates and must be rejected; workflow identity and author independence still require human QA; Run #016 has no solution or counterevidence; token use is still high because broad source previews are reprocessed. A v0.3 VALID result is a collection threshold, not niche validation. Human QA remains mandatory before Signal approval, clustering, or AVS promotion.
 
 ## NEXT
 
-Clarify the founder's handmade production role and available resources, then agree a focused research brief for the two E-commerce business tracks. Keep product-demand evidence for handmade goods distinct from seller-workflow evidence for B2B software; existing seller-pain records do not validate a physical product. After the brief is set, Market Scout owns bounded discovery and collection, the assistant performs QA/analysis, and the founder makes commercial approval decisions. Keep all 12 existing Signals PENDING; no product launch, cluster or AVS promotion is approved by this strategy discussion.
+Agree the concrete minimum scope of the proposed Handmade Business function inside MIE, then extend and test the existing Market Scout path for one bounded Etsy/handmade research assignment plus directly relevant operator lessons. The screenshots can seed the first assignment without committing to crochet as the niche. Use a short research -> founder selection -> sample/product -> listing/shipping -> observed feedback loop; there is no fixed six-week preparation requirement. Market Scout owns discovery/collection, the assistant owns QA/analysis, and the founder approves commercial decisions. Keep all 12 existing B2B Signals PENDING; neither anecdotes nor research output automatically approve production, spending, listings or AVS promotion.
 
 ## IMPORTANT DECISIONS / INVARIANTS
 
 - AVS business scope is exclusively E-commerce (founder decision, 2026-09-25).
+- Reuse existing MIE/Market Scout to support the founder's handmade selling business, including niche research and practical E-commerce operating experience. Detailed feature design must be discussed; do not treat a new UI, mode or connector as already implemented.
+- Founder rejected a fixed six-week preparation plan. Work in short research-to-action iterations and learn from actual selling and operating feedback.
+- Practical learning must preserve the original operator's context, actions, reported outcomes, date and source; distinguish anecdotes and self-reported results from independently verified evidence.
 - Both business tracks are intended: AI/Agent/Automation products for E-commerce sellers and the founder's own physical handmade selling business. Neither track replaces the other. Their detailed commercial focus and execution sequence remain to be agreed.
 - Do not redesign AVS Core before running real campaigns.
 - One experiment/week is more important than one app/week.
